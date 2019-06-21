@@ -4,6 +4,7 @@ import requests
 from penGU.db.NGSDatabase import NGSDatabase
 
 def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url):
+    print("Synchronising local MLST reference database with PubMLST\n")
     ## Check if URL is already in the database
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
@@ -20,7 +21,7 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
         print("NO DATABASE OR PROVIDED URL FOR SEQUENCE TYPES - FAILED TO UPDATE MLST DATABASE")
 
     if pubmlst_url_from_db is None and pubmlst_url is not None:
-        print("FIRST TIME - ADDING URL TO DATABASE")
+        print("NO DATABASE URL - ADDING PROVIDED URL TO DATABASE")
         time_now = datetime.datetime.now()
         cur.execute("""INSERT INTO mlst_scheme_metadata 
                        (pubmlst_url, pubmlst_updated_at, pubmlst_name) 
@@ -28,7 +29,7 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
                        """, (pubmlst_url, time_now, mlst_scheme_name))
 
     elif pubmlst_url is None and pubmlst_url_from_db is not None:
-        print("NO URL SUPPLIED - USING DB URL")
+        print("NO URL PROVIDED - USING DATABASE URL")
         pubmlst_url = pubmlst_url_from_db
 
     elif pubmlst_url_from_db[0] != pubmlst_url:
@@ -37,11 +38,11 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
                        SET pubmlst_url = (%s), pubmlst_updated_at = (%s) 
                        WHERE pubmlst_name like (%s);
                        """, (pubmlst_url, time_now, mlst_scheme_name))
-        print("NOT EQUAL - UPDATING DB URL")
+        print("PROVIDED URL DIFFERENT TO DATABASE URL - UPDATING DATABASE URL")
 
 
     elif pubmlst_url_from_db[0] == pubmlst_url:
-        print("EQUAL - USING SUPPLIED URL NOT UPDATING DB URL")
+        print("PROVIDED URL IS IDENTICAL TO DATABASE URL")
 
     conn.commit()
     cur.close()

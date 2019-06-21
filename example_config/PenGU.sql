@@ -61,7 +61,6 @@ create table clustercode_snpaddress(
     ID SERIAL primary key not null,
     clustercode text unique not null,
     clustercode_is_singleton bool not null,
-    clustercode_updated date not null,
     reference_name text not null,
     total_snps int,
     t250 int not null,
@@ -72,7 +71,8 @@ create table clustercode_snpaddress(
     t5 int not null,
     t2 int not null,
     t0 int not null,
-    created_at timestamp default current_timestamp
+    created_at timestamp default current_timestamp,
+    clustercode_updated date not null,
     );
 
 create table clustercode(

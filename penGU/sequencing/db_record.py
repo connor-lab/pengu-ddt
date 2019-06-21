@@ -25,16 +25,7 @@ def update_sequencing_database(config_dict, csv_file):
         cur = conn.cursor()
 
         for row in sequencing_data_clean:
-            print("""{y_number} | 
-                     {sequencing_instrument} | 
-                     {sequencing_run} | 
-                     {sequencing_start_date} | 
-                     {sequencing_end_date} |
-                     {calculated_magnitude} |
-                     {trimmed_readlength} |
-                     {mean_insert_size}
-                     {qc_pass}
-                     """.format(**row).replace("\n", ""))
+            print("Adding {y_number} | {sequencing_run} to the sequencing database".format(**row))
                 
             cur.execute("""INSERT INTO sequencing 
                            (y_number, 
