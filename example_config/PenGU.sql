@@ -72,7 +72,7 @@ create table clustercode_snpaddress(
     t2 int not null,
     t0 int not null,
     created_at timestamp default current_timestamp,
-    clustercode_updated date not null,
+    clustercode_updated date not null
     );
 
 create table clustercode(
