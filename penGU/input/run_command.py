@@ -12,6 +12,8 @@ from penGU.mlst.db_record import update_mlst_database
 from penGU.distance.update_refdb import update_distance_refdb
 from penGU.distance.db_record import update_distance_database
 
+from penGU.snpaddress.clustercode_database import update_clustercode_database
+
 def run_commmand(config_dict, args):
     if args.command is None:
         print("Please use a subcommand. Subcommand options can be viewed with " + sys.argv[0] + " --help\n")
@@ -36,5 +38,8 @@ def run_commmand(config_dict, args):
     
     elif 'update_distance_db' in args.command:
         update_distance_database(config_dict, args.dist_csv)
+
+    elif 'update_clustercode_db' in args.command:
+        update_clustercode_database(config_dict, args.snapperdb_conf)
 
     

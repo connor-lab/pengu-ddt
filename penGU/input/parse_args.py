@@ -40,6 +40,11 @@ def parse_commandline_args():
     add_isolate_parser = subparsers.add_parser('update_distance_db')
     add_isolate_parser.add_argument('-d', '--distance_csv', dest='dist_csv', required=True, help="csv containing isolate mash distance data")
 
+    # Update clustercode database
+    add_isolate_parser = subparsers.add_parser('update_clustercode_db')
+    add_isolate_parser.add_argument('-a', '--snapperdb_conf', dest='snapperdb_conf', required=True, help="path to snapperdb config file for database")
+
+
     # Parse args
     args = parser.parse_args()
 

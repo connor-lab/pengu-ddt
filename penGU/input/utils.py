@@ -3,10 +3,10 @@ import os
 
 from penGU.db.penguDB import parse_config
 
-def check_config_file(config_file=None):
+def check_config_file(config_file=None, config_type="NGS"):
     try:
         if config_file is not None:
-            config_dict = parse_config(config_file)
+            config_dict = parse_config(config_file, config_type)
             return config_dict
     except:
         print("Please provide a working config file")
