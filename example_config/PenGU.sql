@@ -83,6 +83,14 @@ create table clustercode(
     clustercode_updated timestamp not null
     );
 
+create table clustercode_history(
+    ID SERIAL primary key not null,
+    y_number text not null references isolate(y_number),
+    old_clustercode text not null references clustercode_snpaddress(clustercode),
+    new_clustercode text not null references clustercode_snpaddress(clustercode),
+    created_at timestamp default current_timestamp
+    );
+
 create table reference_metadata(
     ID SERIAL primary key not null,
     reference_name text unique not null,

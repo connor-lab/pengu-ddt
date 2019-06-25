@@ -24,6 +24,21 @@ def retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict):
     
     return snp_address_freq
 
+def create_singleton_clustercode(insert_dict):
+    """ Add a 000000 clustercode to the insert dict"""
+    singleton_dict= {}
+    for key in insert_dict:
+        if re.match("^t\\d{1,3}$", key):
+            singleton_dict[key] = 0
+    
+    singleton_dict["reference_name"] = "SINGLETON"
+    singleton_dict["snpaddress_string"] = "00000000"
+    singleton_dict["clustercode"] = "S"
+    singleton_dict["clustercode_updated"] = datetime.datetime.now()
+    singleton_dict["clustercode_frequency"] = None
+
+    return singleton_dict
+
 def clean_snapperdb_data(config_dict, snapperdb_config_dict):
     snp_address_freq = retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict)
     
@@ -46,21 +61,10 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict):
 
         insert_dict["clustercode"] = clustercode
         insert_dict["snpaddress_string"] = address.replace(".","")
+        
         insert_dict_list.append(insert_dict)
 
-    ## Make singleton clustercode 
-    singleton_dict= {}
-    for key in insert_dict:
-        if re.match("^t\\d{1,3}$", key):
-            singleton_dict[key] = 0
-    
-    singleton_dict["reference_name"] = "SINGLETON"
-    singleton_dict["snpaddress_string"] = "00000000"
-    singleton_dict["clustercode"] = "S"
-    singleton_dict["clustercode_updated"] = datetime.datetime.now()
-    singleton_dict["clustercode_frequency"] = None
-
-    insert_dict_list.append(singleton_dict)
+    insert_dict_list.append(create_singleton_clustercode(insert_dict))
 
     return insert_dict_list
 
