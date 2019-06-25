@@ -31,10 +31,8 @@ def run_commmand(config_dict, args):
     elif 'add_sequencing_metadata' in args.command:
         update_sequencing_database(config_dict, args.sequencing_csv)
 
-    elif 'update_mlst_refdb' in args.command:
-        generate_mlst_refdb(config_dict, args.mlst_scheme_name, args.pubmlst_url)
-
     elif 'update_mlst_db' in args.command:
+        generate_mlst_refdb(config_dict, args.mlst_scheme_name, args.pubmlst_url)
         update_mlst_database(config_dict, args.mlst_csv)
 
     elif 'update_distance_refdb' in args.command:

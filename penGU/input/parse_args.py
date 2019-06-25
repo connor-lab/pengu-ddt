@@ -23,14 +23,11 @@ def parse_commandline_args():
     add_isolate_parser = subparsers.add_parser('add_sequencing_metadata')
     add_isolate_parser.add_argument('-s', '--sequencing_csv', dest='sequencing_csv', required=True, help="csv containing sequencing run metadata")
     
-    # Update mlst reference database
-    add_isolate_parser = subparsers.add_parser('update_mlst_refdb')
+    # Update mlst database
+    add_isolate_parser = subparsers.add_parser('update_mlst_db')
     add_isolate_parser.add_argument('-p', '--pubmlst_url', dest='pubmlst_url', required=False, help="PubMLST URL to download MLST ST definitions (We'll use the previous one if not provided)")
     add_isolate_parser.add_argument('-n', '--mlst_scheme', dest='mlst_scheme_name', required=True, help="MLST scheme name")
-    
-    # Update mlst isolate database
-    add_isolate_parser = subparsers.add_parser('update_mlst_db')
-    add_isolate_parser.add_argument('-m', '--mlst_csv', dest='mlst_csv', required=True, help="csv containing MLST and ST calls for isolates")
+    add_isolate_parser.add_argument('-m', '--mlst_csv', dest='mlst_csv', required=True, help="csv containing MLST and ST calls for isolates (from MLST")
     
     # Update mash distance reference database
     add_isolate_parser = subparsers.add_parser('update_distance_refdb')

@@ -10,4 +10,3 @@ def write_updated_records_to_csv(updated_records, output_csv):
         writer.writeheader()
         for row in updated_records:
             writer.writerow(row)
-            

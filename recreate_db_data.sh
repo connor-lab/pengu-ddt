@@ -8,12 +8,10 @@ echo "drop database digest;" | psql -h localhost -U postgres
 
 ./ddt.py -c example_config/example.cfg add_sequencing_metadata -s example_data/sequencing_data.csv
 
-./ddt.py -c example_config/example.cfg update_mlst_refdb -p https://pubmlst.org/data/profiles/cdifficile.txt -n cdifficile
-
-./ddt.py -c example_config/example.cfg update_mlst_db -m example_data/mlst_data.csv
+./ddt.py -c example_config/example.cfg update_mlst_db -p https://pubmlst.org/data/profiles/cdifficile.txt -n cdifficile -m example_data/mlst_data.csv
 
 ./ddt.py -c example_config/example.cfg update_distance_refdb -r example_data/distance_reference_data.csv
 
 ./ddt.py -c example_config/example.cfg update_distance_db -d example_data/distance_data.csv
 
-./ddt.py -c example_config/example.cfg update_clustercode_db -i example_data/snp_address_isolate_data.txt -a example_config/example_snapperdb_conf.txt -o example_data/snp_address_isolate_output.csv
+./ddt.py -c example_config/example.cfg update_clustercode_db -i example_data/snp_address_isolate_data.txt -a example_config/example_snapperdb_conf.txt -o example_output/snp_address_isolate_output.csv
