@@ -54,7 +54,7 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict):
         if re.match("^t\\d{1,3}$", key):
             singleton_dict[key] = 0
     
-    singleton_dict["reference_name"] = snapperdb_config_dict["reference_genome"]
+    singleton_dict["reference_name"] = "SINGLETON"
     singleton_dict["snpaddress_string"] = "00000000"
     singleton_dict["clustercode"] = "S"
     singleton_dict["clustercode_updated"] = datetime.datetime.now()
@@ -111,5 +111,6 @@ def update_clustercode_database(config_dict, snapperdb_conf):
         conn.commit()
         cur.close()
         conn.close()
+
     except psycopg2.IntegrityError as e:
             print(e)

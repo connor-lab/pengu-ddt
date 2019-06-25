@@ -43,11 +43,9 @@ def parse_commandline_args():
     # Update clustercode database
     add_isolate_parser = subparsers.add_parser('update_clustercode_db')
     add_isolate_parser.add_argument('-a', '--snapperdb_conf', dest='snapperdb_conf', required=True, help="path to snapperdb config file for database")
-
-    # Update clustercode database
-    add_isolate_parser = subparsers.add_parser('update_isolate_clustercode_db')
-    add_isolate_parser.add_argument('-a', '--snapperdb_conf', dest='snapperdb_conf', required=True, help="path to snapperdb config file for database")
     add_isolate_parser.add_argument('-i', '--isolate_file', dest='isolate_file', required=True, help="textfile of y_numbers for isolate")
+    add_isolate_parser.add_argument('-o', '--output_csv', dest='output_csv', required=True, help="output csv containing updated snp addresses")
+    
 
     # Parse args
     args = parser.parse_args()

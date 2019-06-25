@@ -83,10 +83,10 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    modified_records = {}
-
     try:
+        modified_records = []
         for row in insert_dict_list:
+            updated = {}
             ## Does isolate exist in DB? If yes UPDATE if no INSERT
             dict_cur.execute("""SELECT y_number,clustercode FROM clustercode WHERE 
                            y_number = %(y_number)s""", (row))
@@ -95,6 +95,10 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
 
             if s is not None:
                 if s["clustercode"] != row["clustercode"]:
+                    updated["y_number"] = row["y_number"]
+                    updated["old_clustercode"] = s["clustercode"]
+                    updated["new_clustercode"] = row["clustercode"]
+
                     print("Updating clustercode of isolate {} from {} to {}".format(row["y_number"], s["clustercode"], row["clustercode"]))
                                 
                     dict_cur.execute("""UPDATE clustercode
@@ -106,6 +110,10 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
                     print("Not updating clustercode of isolate {} ({} == {})".format(row["y_number"], s["clustercode"], row["clustercode"]))
 
             if s is None:
+                updated["y_number"] = row["y_number"]
+                updated["old_clustercode"] = None
+                updated["new_clustercode"] = row["clustercode"]
+
                 print("Adding isolate {} with to database with clustercode {}".format(row["y_number"], row["clustercode"]))
                 dict_cur.execute("""INSERT INTO clustercode
                         (y_number,
@@ -113,8 +121,15 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
                         clustercode_updated)
                         VALUES (%(y_number)s, %(clustercode)s, %(clustercode_updated)s);
                         """, row)
+            
+            if updated:
+                modified_records.append(updated)
+        
         conn.commit()
         dict_cur.close()
         conn.close()
+    
+        return modified_records
+
     except psycopg2.IntegrityError as e:
             print(e)
