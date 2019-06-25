@@ -60,7 +60,7 @@ create table mlst(
 create table clustercode_snpaddress(
     ID SERIAL primary key not null,
     clustercode text unique not null,
-    clustercode_frequency int not null,
+    clustercode_frequency int,
     reference_name text not null,
     t250 int not null,
     t100 int not null,
@@ -72,7 +72,7 @@ create table clustercode_snpaddress(
     t0 int not null,
     snpaddress_string text unique not null,
     created_at timestamp default current_timestamp,
-    clustercode_updated date not null
+    clustercode_updated timestamp not null
     );
 
 create table clustercode(
@@ -80,7 +80,7 @@ create table clustercode(
     y_number text not null references isolate(y_number),
     clustercode text not null references clustercode_snpaddress(clustercode),
     created_at timestamp default current_timestamp,
-    isolate_clustercode_updated date not null
+    clustercode_updated timestamp not null
     );
 
 create table reference_metadata(

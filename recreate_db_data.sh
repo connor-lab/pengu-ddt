@@ -15,3 +15,7 @@ echo "drop database digest;" | psql -h localhost -U postgres
 ./ddt.py -c example_config/example.cfg update_distance_refdb -r example_data/distance_reference_data.csv
 
 ./ddt.py -c example_config/example.cfg update_distance_db -d example_data/distance_data.csv
+
+./ddt.py -c example_config/example.cfg update_clustercode_db -a example_config/example_snapperdb_conf.txt
+
+./ddt.py -c example_config/example.cfg update_isolate_clustercode_db -i example_data/snp_address_isolate_data.txt -a example_config/example_snapperdb_conf.txt

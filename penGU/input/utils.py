@@ -31,6 +31,20 @@ def read_data_from_csv(csv_file, header=None, **kwargs):
                 row_list.append(record)
     return row_list
 
+def read_lines_from_isolate_data(isolate_list_file):
+    if os.path.isabs(isolate_list_file) == False:
+        path_to_file = os.path.join(isolate_list_file)
+    else:
+        path_to_file = isolate_list_file
+    
+    isolate_list = []
+    with open(path_to_file, mode='r') as text_file:
+        isolate_list = text_file.read().splitlines()
+        #isolate_list.append(isolate)
+    
+    return isolate_list
+
+
 def string_to_bool(s):
     trues = ("yes", "true", "1")
     return s.lower() in trues

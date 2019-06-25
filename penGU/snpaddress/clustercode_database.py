@@ -10,7 +10,7 @@ from penGU.input.utils import check_config_file
 
 def retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict):
     """ This function queries a snapperdb database and
-    returns a dict of {{tXX : cluster} : frequency}"""
+    returns a nested dict of {{tXX : cluster} : frequency}"""
 
     NGSdb = NGSDatabase(snapperdb_config_dict)
     conn = NGSdb._connect_to_db()
@@ -26,7 +26,9 @@ def retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict):
 
 def clean_snapperdb_data(config_dict, snapperdb_config_dict):
     snp_address_freq = retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict)
+    
     insert_dict_list = []
+    
     for address,freq in snp_address_freq.items():
         insert_dict = json.loads(address)
         insert_dict["clustercode_frequency"] = freq
@@ -46,6 +48,20 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict):
         insert_dict["snpaddress_string"] = address.replace(".","")
         insert_dict_list.append(insert_dict)
 
+    ## Make singleton clustercode 
+    singleton_dict= {}
+    for key in insert_dict:
+        if re.match("^t\\d{1,3}$", key):
+            singleton_dict[key] = 0
+    
+    singleton_dict["reference_name"] = snapperdb_config_dict["reference_genome"]
+    singleton_dict["snpaddress_string"] = "00000000"
+    singleton_dict["clustercode"] = "S"
+    singleton_dict["clustercode_updated"] = datetime.datetime.now()
+    singleton_dict["clustercode_frequency"] = None
+
+    insert_dict_list.append(singleton_dict)
+
     return insert_dict_list
 
 def update_clustercode_database(config_dict, snapperdb_conf):
@@ -58,13 +74,14 @@ def update_clustercode_database(config_dict, snapperdb_conf):
 
     try:
         for row in insert_dict_list:
+            
             ## Does snpaddress exist in DB? If yes UPDATE if no INSERT
             cur.execute("""SELECT id FROM clustercode_snpaddress WHERE 
                            snpaddress_string = %(snpaddress_string)s 
                            AND reference_name = %(reference_name)s""", (row))
             
             if cur.fetchone() is not None:
-                print("Updating SNPaddress freqency to " + str(row["clustercode_frequency"]) + " for " + row["clustercode"])
+                print("Updating clustercode freqency to {!s} for {}".format(row["clustercode_frequency"], row["clustercode"]))
                 cur.execute("""UPDATE clustercode_snpaddress
                             SET clustercode_frequency = %(clustercode_frequency)s,
                             clustercode_updated = %(clustercode_updated)s
