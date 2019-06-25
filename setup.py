@@ -18,12 +18,12 @@ else:
 install_requires = [str(ir.req) for ir in install_reqs]
 
 setuptools.setup(
-    name='ddt',
+    name='pengu-ddt',
     version=version,
-    author="Matt Bull",
+    author="Matt Bull [Public Health Wales]",
     author_email="Matthew.Bull@Wales.nhs.uk",
     description="A package for interacting with the DIGEST database",
     packages=setuptools.find_packages(),
-    scripts=["ddt.py"],
+    scripts=["pengu-ddt"],
     install_requires=install_requires
     )
