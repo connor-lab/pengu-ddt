@@ -2,7 +2,7 @@ import argparse
 
 def parse_commandline_args():
 
-    parser = argparse.ArgumentParser(prog='ddt.py')
+    parser = argparse.ArgumentParser(prog='pengu-ddt')
 
     # Make config file required for all subcommands
     required_args = parser.add_argument_group("required arguments")
