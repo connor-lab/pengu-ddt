@@ -16,12 +16,17 @@ def update_isolate_database(config_dict, isolate_csv):
         # Add csv data in one chunk then commit once and close connection
         isolate_data_list = read_data_from_csv(isolate_csv)
         for record in isolate_data_list:
+            
             print("Adding {y_number} | {episode_number} to the isolate database".format(
                 y_number=record["y_number"], episode_number=record["episode_number"]))
-            cur.execute("INSERT INTO isolate (y_number, episode_number) VALUES (%s, %s)", 
-            (record["y_number"], record["episode_number"]))
+
+            sql = """INSERT INTO isolate (y_number, episode_number) VALUES (%(y_number)s, %(episode_number)s)"""
+            
+            cur.execute(sql, record)
+        
         conn.commit()
         cur.close()
         conn.close()
+    
     except psycopg2.IntegrityError as error:
         print(error)

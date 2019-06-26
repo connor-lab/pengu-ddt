@@ -15,7 +15,8 @@ def retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict):
     NGSdb = NGSDatabase(snapperdb_config_dict)
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    dict_cur.execute("""SELECT t250,t100,t50,t25,t10,t5,t2,t0 FROM strain_clusters;""")
+    sql = "SELECT t250,t100,t50,t25,t10,t5,t2,t0 FROM strain_clusters;"
+    dict_cur.execute(sql)
     rec = dict_cur.fetchall()
     dict_cur.close()
     conn.close()
@@ -39,6 +40,10 @@ def create_singleton_clustercode(insert_dict):
 
     return singleton_dict
 
+def generate_clustercode(insert_dict):
+    
+    print(insert_dict)
+
 def clean_snapperdb_data(config_dict, snapperdb_config_dict):
     snp_address_freq = retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict)
     
@@ -50,16 +55,19 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict):
         insert_dict["reference_name"] = snapperdb_config_dict["reference_genome"]
         insert_dict["clustercode_updated"] = datetime.datetime.now()
 
-        address = []
-        for i in insert_dict.keys():
-            if re.match("^t\\d{1,3}$", i):
-                address.append(insert_dict[i])
+        # address = []
+        # for i in insert_dict.keys():
+        #     if re.match("^t\\d{1,3}$", i):
+        #         address.append(insert_dict[i])
         
-        address = '.'.join(str(a) for a in address)
-        today = "{:%Y-%m-%d}".format(datetime.datetime.now())
-        clustercode = today + "." + insert_dict["reference_name"] + "." + address
+        # address = '.'.join(str(a) for a in address)
+        # today = "{:%Y-%m-%d}".format(datetime.datetime.now())
 
-        insert_dict["clustercode"] = clustercode
+
+        #clustercode = today + "." + insert_dict["reference_name"] + "." + address
+
+        #insert_dict["clustercode"] = generate_clustercode()
+        generate_clustercode(insert_dict)
         insert_dict["snpaddress_string"] = address.replace(".","")
         
         insert_dict_list.append(insert_dict)
@@ -80,20 +88,24 @@ def update_clustercode_database(config_dict, snapperdb_conf):
         for row in insert_dict_list:
             
             ## Does snpaddress exist in DB? If yes UPDATE if no INSERT
-            cur.execute("""SELECT id FROM clustercode_snpaddress WHERE 
+            sql = """SELECT id FROM clustercode_snpaddress WHERE 
                            snpaddress_string = %(snpaddress_string)s 
-                           AND reference_name = %(reference_name)s""", (row))
+                           AND reference_name = %(reference_name)s"""
+
+            cur.execute(sql,(row))
             
             if cur.fetchone() is not None:
                 print("Updating clustercode freqency to {!s} for {}".format(row["clustercode_frequency"], row["clustercode"]))
-                cur.execute("""UPDATE clustercode_snpaddress
+                sql = """UPDATE clustercode_snpaddress
                             SET clustercode_frequency = %(clustercode_frequency)s,
                             clustercode_updated = %(clustercode_updated)s
                             WHERE snpaddress_string = %(snpaddress_string)s 
-                            AND reference_name = %(reference_name)s""", (row))
+                            AND reference_name = %(reference_name)s"""
+
+                cur.execute(sql, (row))
             
             elif cur.fetchone() is None:
-                cur.execute("""INSERT INTO clustercode_snpaddress
+                sql = """INSERT INTO clustercode_snpaddress
                         (clustercode,
                         clustercode_frequency, 
                         reference_name, 
@@ -111,7 +123,9 @@ def update_clustercode_database(config_dict, snapperdb_conf):
                         %(reference_name)s, %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
                         %(t10)s, %(t5)s, %(t2)s, %(t0)s, %(snpaddress_string)s, 
                         %(clustercode_updated)s);
-                        """, row)
+                        """
+                cur.execute(sql, row)
+        
         conn.commit()
         cur.close()
         conn.close()

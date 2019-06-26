@@ -8,11 +8,12 @@ def update_clustercode_history(config_dict, updated_records):
 
     for row in updated_records:
         if row["old_clustercode"] is not None:
-            cur.execute("""INSERT INTO clustercode_history
+            sql = """INSERT INTO clustercode_history
                         (y_number,
                         old_clustercode, 
                         new_clustercode)
-                        VALUES (%(y_number)s, %(old_clustercode)s, %(new_clustercode)s);""", row)
+                        VALUES (%(y_number)s, %(old_clustercode)s, %(new_clustercode)s);"""
+            cur.execute(sql, row)
     
     conn.commit()
     cur.close()

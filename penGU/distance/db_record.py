@@ -28,14 +28,19 @@ def update_distance_database(config_dict, dist_csv):
     cur = conn.cursor()
     try:
         for row in dist_data_clean:
-            cur.execute("""INSERT INTO reference_distance
+            
+            sql = """INSERT INTO reference_distance
                        (y_number,
                        reference_name, 
                        reference_mash_distance, 
                        reference_mash_p_value,
                        reference_common_kmers)
-                       VALUES (%(y_number)s, %(reference_name)s, %(reference_mash_distance)s, %(reference_mash_p_value)s, %(reference_common_kmers)s);
-                    """, row)
+                       VALUES (%(y_number)s, %(reference_name)s, 
+                       %(reference_mash_distance)s, %(reference_mash_p_value)s, 
+                       %(reference_common_kmers)s);"""
+
+            cur.execute(sql, row)
+
         conn.commit()
         cur.close()
         conn.close()

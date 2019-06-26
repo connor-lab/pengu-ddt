@@ -14,8 +14,9 @@ def get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list):
 
     isolate_snpaddress_dict = {}
     for isolate in isolate_list:
-        dict_cur.execute("""SELECT t250,t100,t50,t25,t10,t5,t2,t0 FROM strain_clusters WHERE 
-                               name = %s """, (isolate, ))
+        sql = """SELECT t250,t100,t50,t25,t10,t5,t2,t0 FROM strain_clusters WHERE 
+                               name = %s """
+        dict_cur.execute(sql, (isolate, ))
 
         s = dict_cur.fetchone()
         if s is None:
@@ -47,8 +48,10 @@ def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict):
     for isolate,snpaddress in isolate_snpaddress_dict.items():
         insert_dict = {}
         
-        dict_cur.execute("""SELECT clustercode_frequency, snpaddress_string, clustercode FROM clustercode_snpaddress WHERE 
-                               snpaddress_string = %s """, (snpaddress, ))
+        sql = """SELECT clustercode_frequency, snpaddress_string, clustercode 
+                FROM clustercode_snpaddress WHERE 
+                snpaddress_string = %s """
+        dict_cur.execute(sql, (snpaddress, ))
         
         s = dict_cur.fetchone()
 
@@ -100,11 +103,13 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
                     updated["new_clustercode"] = row["clustercode"]
 
                     print("Updating clustercode of isolate {} from {} to {}".format(row["y_number"], s["clustercode"], row["clustercode"]))
-                                
-                    dict_cur.execute("""UPDATE clustercode
-                                    SET clustercode = %(clustercode)s,
-                                    clustercode_updated = %(clustercode_updated)s
-                                    WHERE y_number = %(y_number)s""", (row))
+                    
+                    sql = """UPDATE clustercode
+                            SET clustercode = %(clustercode)s,
+                            clustercode_updated = %(clustercode_updated)s
+                            WHERE y_number = %(y_number)s"""
+
+                    dict_cur.execute(sql, (row))
 
                 elif s["clustercode"] == row["clustercode"]:
                     print("Not updating clustercode of isolate {} ({} == {})".format(row["y_number"], s["clustercode"], row["clustercode"]))
@@ -115,12 +120,14 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
                 updated["new_clustercode"] = row["clustercode"]
 
                 print("Adding isolate {} with to database with clustercode {}".format(row["y_number"], row["clustercode"]))
-                dict_cur.execute("""INSERT INTO clustercode
+                
+                sql = """INSERT INTO clustercode
                         (y_number,
                         clustercode, 
                         clustercode_updated)
-                        VALUES (%(y_number)s, %(clustercode)s, %(clustercode_updated)s);
-                        """, row)
+                        VALUES (%(y_number)s, %(clustercode)s, %(clustercode_updated)s);"""
+                
+                dict_cur.execute(sql, row)
             
             if updated:
                 modified_records.append(updated)

@@ -44,21 +44,20 @@ def update_mlst_database(config_dict, csv_file):
     cur = conn.cursor()
     try:
         for row in mlst_data_clean:
-            cur.execute("""INSERT INTO mlst
-                       (y_number,
-                       st, 
-                       locus_1, 
-                       locus_2,
-                       locus_3,
-                       locus_4,
-                       locus_5,
-                       locus_6,
-                       locus_7)
-                       VALUES (%(isolate)s, %(ST)s, %(locus_1)s, %(locus_2)s, %(locus_3)s, %(locus_4)s, %(locus_5)s, %(locus_6)s, %(locus_7)s);
-                    """, row)
+
+            sql = """INSERT INTO mlst
+                    (y_number, st, locus_1, locus_2, locus_3, 
+                    locus_4, locus_5, locus_6, locus_7) VALUES 
+                    (%(isolate)s, %(ST)s, %(locus_1)s, %(locus_2)s, 
+                    %(locus_3)s, %(locus_4)s, %(locus_5)s, 
+                    %(locus_6)s, %(locus_7)s);"""
+
+            cur.execute(sql, row)
+
         conn.commit()
         cur.close()
         conn.close()
+        
     except psycopg2.IntegrityError as e:
             print(e)
     

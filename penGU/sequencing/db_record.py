@@ -26,8 +26,8 @@ def update_sequencing_database(config_dict, csv_file):
 
         for row in sequencing_data_clean:
             print("Adding {y_number} | {sequencing_run} to the sequencing database".format(**row))
-                
-            cur.execute("""INSERT INTO sequencing 
+
+            sql = """INSERT INTO sequencing 
                            (y_number, 
                            sequencing_instrument, 
                            sequencing_run, 
@@ -46,7 +46,10 @@ def update_sequencing_database(config_dict, csv_file):
                            %(calculated_magnitude)s, 
                            %(trimmed_readlength)s,
                            %(mean_insert_size)s,
-                           %(qc_pass)s)""", (row))
+                           %(qc_pass)s)"""
+
+            cur.execute(sql, (row))
+            
         conn.commit()
         cur.close()
         conn.close()

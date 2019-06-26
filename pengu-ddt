@@ -14,3 +14,9 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+
+'''
+TODO:
+Get Z-score from snapperdb, automatically set fails to exclude and make a list of them
+'''

@@ -12,7 +12,8 @@ def update_distance_refdb(config_dict, dist_csv):
     
     try:
         for row in dist_ref_data:
-            cur.execute("""INSERT into reference_metadata
+
+            sql = """INSERT into reference_metadata
                           (reference_name,
                           snapperdb_db_name,
                           ncbi_accession,
@@ -21,10 +22,14 @@ def update_distance_refdb(config_dict, dist_csv):
                           (%(reference_name)s,
                           %(snapperdb_db_name)s,
                           %(ncbi_accession)s,
-                          %(genome_filename)s)""", (row))
+                          %(genome_filename)s)"""
+
+            cur.execute(sql, (row))
+
         conn.commit()
         cur.close()
         conn.close()
+        
     except psycopg2.IntegrityError as e:
         print(e)
 

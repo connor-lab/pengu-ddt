@@ -9,11 +9,13 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
     cur = conn.cursor()
-    cur.execute("""SELECT pubmlst_url 
-                   FROM mlst_scheme_metadata 
-                   WHERE pubmlst_name 
-                   LIKE (%s);
-                   """, (mlst_scheme_name,))
+
+    sql = """SELECT pubmlst_url 
+            FROM mlst_scheme_metadata 
+            WHERE pubmlst_name 
+            LIKE (%s);"""
+
+    cur.execute(sql, (mlst_scheme_name,))
     
     pubmlst_url_from_db = cur.fetchone()
     
@@ -23,10 +25,13 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
     if pubmlst_url_from_db is None and pubmlst_url is not None:
         print("NO DATABASE URL - ADDING PROVIDED URL TO DATABASE")
         time_now = datetime.datetime.now()
-        cur.execute("""INSERT INTO mlst_scheme_metadata 
+
+        sql = """INSERT INTO mlst_scheme_metadata 
                        (pubmlst_url, pubmlst_updated_at, pubmlst_name) 
                        VALUES (%s, %s, %s);
-                       """, (pubmlst_url, time_now, mlst_scheme_name))
+                       """
+
+        cur.execute(sql, (pubmlst_url, time_now, mlst_scheme_name))
 
     elif pubmlst_url is None and pubmlst_url_from_db is not None:
         print("NO URL PROVIDED - USING DATABASE URL")
@@ -34,10 +39,12 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
 
     elif pubmlst_url_from_db[0] != pubmlst_url:
         time_now = datetime.datetime.now()
-        cur.execute("""UPDATE mlst_scheme_metadata 
-                       SET pubmlst_url = (%s), pubmlst_updated_at = (%s) 
-                       WHERE pubmlst_name like (%s);
-                       """, (pubmlst_url, time_now, mlst_scheme_name))
+
+        sql = """UPDATE mlst_scheme_metadata 
+                SET pubmlst_url = (%s), pubmlst_updated_at = (%s) 
+                WHERE pubmlst_name like (%s);"""
+
+        cur.execute(sql, (pubmlst_url, time_now, mlst_scheme_name))
         print("PROVIDED URL DIFFERENT TO DATABASE URL - UPDATING DATABASE URL")
 
 
@@ -79,7 +86,8 @@ def update_mlst_metadata(config_dict, mlst_scheme_name, pubmlst_url=None):
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
     cur = conn.cursor()
-    cur.execute("""UPDATE mlst_scheme_metadata
+
+    sql = """UPDATE mlst_scheme_metadata
                    SET locus_1 = %(locus_1)s, 
                        locus_2 = %(locus_2)s,
                        locus_3 = %(locus_3)s,
@@ -88,7 +96,10 @@ def update_mlst_metadata(config_dict, mlst_scheme_name, pubmlst_url=None):
                        locus_6 = %(locus_6)s,
                        locus_7 = %(locus_7)s
                     WHERE pubmlst_name LIKE %(mlst_scheme_name)s;
-                    """, locus_gene_dict)
+                    """
+
+    cur.execute(sql, locus_gene_dict)
+
     conn.commit()
     cur.close()
     conn.close()
@@ -105,15 +116,24 @@ def generate_mlst_refdb(config_dict, mlst_scheme_name, pubmlst_url=None):
     
     for ST_row in ST_list:
         row = list(ST_row.values())
-        cur.execute("""SELECT exists
-                       (SELECT 1 FROM mlst_sequence_types
-                       WHERE st = %s)""", (row[0],))
+
+        sql = """SELECT exists
+                (SELECT 1 FROM mlst_sequence_types
+                WHERE st = %s)"""
+        
+        cur.execute(sql, (row[0],))
+
         ST_exists = cur.fetchone()[0]
+        
         if ST_exists is False:
-            cur.execute("""INSERT INTO mlst_sequence_types 
+
+            sql = """INSERT INTO mlst_sequence_types 
                        (ST, locus_1, locus_2, locus_3, locus_4, locus_5, locus_6, locus_7) 
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
-                       """, (row))
+                       """
+            
+            cur.execute(sql, (row))
+    
     conn.commit()
     cur.close()
     conn.close()
