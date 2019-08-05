@@ -97,7 +97,7 @@ def update_clustercode_database(config_dict, snapperdb_conf):
             
             if res is not None:
                 if res['clustercode_frequency'] is not None and row['clustercode_frequency'] is not res['clustercode_frequency']:
-                    print("Updating clustercode freqency to {!s} for {}".format(row["clustercode_frequency"], row["clustercode"]))
+                    print("Updating clustercode freqency to {clustercode_frequency!s} for {clustercode}".format(**row))
                     sql = """UPDATE clustercode_snpaddress
                             SET clustercode_frequency = %(clustercode_frequency)s,
                             clustercode_updated = %(clustercode_updated)s
@@ -107,6 +107,7 @@ def update_clustercode_database(config_dict, snapperdb_conf):
                     cur.execute(sql, (row))
             
             elif res is None:
+                print("Adding clustercode {clustercode} to database".format(**row))
                 sql = """INSERT INTO clustercode_snpaddress
                         (clustercode,
                         clustercode_frequency, 
