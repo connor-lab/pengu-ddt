@@ -1,5 +1,5 @@
 from penGU.db.NGSDatabase import NGSDatabase
-from penGU.input.utils import check_config_file
+from penGU.input.utils import check_config
 
 def update_clustercode_history(config_dict, updated_records):
     NGSdb = NGSDatabase(config_dict)

@@ -3,7 +3,7 @@ import psycopg2, psycopg2.extras
 import re
 
 from penGU.db.NGSDatabase import NGSDatabase
-from penGU.input.utils import check_config_file, read_lines_from_isolate_data
+from penGU.input.utils import check_config, read_lines_from_isolate_data
 
 def get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list):
     """ Use isolate name to pull snpaddress and convert into string"""
@@ -14,8 +14,10 @@ def get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list):
 
     isolate_snpaddress_dict = {}
     for isolate in isolate_list:
-        sql = """SELECT t250,t100,t50,t25,t10,t5,t2,t0 FROM strain_clusters WHERE 
-                               name = %s """
+        sql = """SELECT t250,t100,t50,t25,t10,t5 FROM sample_clusters WHERE 
+                               fk_sample_id = (
+                                   SELECT pk_id FROM samples WHERE
+                                   sample_name = %s ) """
         dict_cur.execute(sql, (isolate, ))
 
         s = dict_cur.fetchone()
@@ -77,7 +79,7 @@ def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict):
     
 
 def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
-    snapperdb_config_dict = check_config_file(snapperdb_conf, config_type="snapperdb")
+    snapperdb_config_dict = check_config(snapperdb_conf, config_type="snapperdb")
     isolate_list = read_lines_from_isolate_data(isolate_file)
     isolate_snpaddress_dict = get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list)
     insert_dict_list = find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict)
@@ -119,7 +121,7 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
                 updated["old_clustercode"] = None
                 updated["new_clustercode"] = row["clustercode"]
 
-                print("Adding isolate {} with to database with clustercode {}".format(row["y_number"], row["clustercode"]))
+                print("Adding isolate {} to database with clustercode {}".format(row["y_number"], row["clustercode"]))
                 
                 sql = """INSERT INTO clustercode
                         (y_number,

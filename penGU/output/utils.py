@@ -9,4 +9,6 @@ def write_updated_records_to_csv(updated_records, output_csv):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in updated_records:
+            if not row["old_clustercode"]:
+                row["old_clustercode"] = "NA"
             writer.writerow(row)
