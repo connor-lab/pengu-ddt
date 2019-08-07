@@ -35,7 +35,7 @@ def get_or_update_pubmlst_url_from_db(config_dict, mlst_scheme_name, pubmlst_url
 
     elif pubmlst_url is None and pubmlst_url_from_db is not None:
         print("NO URL PROVIDED - USING DATABASE URL")
-        pubmlst_url = pubmlst_url_from_db
+        pubmlst_url = pubmlst_url_from_db[0]
 
     elif pubmlst_url_from_db[0] != pubmlst_url:
         time_now = datetime.datetime.now()

@@ -29,10 +29,11 @@ def parse_mlst_csv(csv_file):
             row["isolate"] = m.group(1)
 
         for key in row:
-            if key.startswith("locus"):
-                row[key] = row[key][row[key].find("(")+1:row[key].find(")")]
+                if key.startswith("locus"):
+                    if row[key] is not None:
+                        row[key] = row[key][row[key].find("(")+1:row[key].find(")")]
         mlst_data_clean.append(row)
-    
+
     return mlst_data_clean
 
 
