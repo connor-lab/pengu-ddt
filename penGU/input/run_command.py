@@ -43,7 +43,7 @@ def run_commmand(config_dict, args):
         update_distance_database(config_dict, args.dist_csv)
 
     elif 'update_clustercode_db' in args.command:
-        update_clustercode_database(config_dict, args.snapperdb_conf)
+        update_clustercode_database(config_dict, args.snapperdb_conf, args.snapperdb_refgenome)
         updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_conf, args.isolate_file)
         if updated_records:
             update_clustercode_history(config_dict, updated_records)

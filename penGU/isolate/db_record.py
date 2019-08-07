@@ -15,10 +15,11 @@ def update_isolate_database(config_dict, isolate_csv):
     
         # Add csv data in one chunk then commit once and close connection
         isolate_data_list = read_data_from_csv(isolate_csv)
+
+        
         for record in isolate_data_list:
-            
-            print("Adding {y_number} | {episode_number} to the isolate database".format(
-                y_number=record["y_number"], episode_number=record["episode_number"]))
+
+            print("Adding {y_number} | {episode_number} to the isolate database".format(**record))
 
             sql = """INSERT INTO isolate (y_number, episode_number) VALUES (%(y_number)s, %(episode_number)s)"""
             

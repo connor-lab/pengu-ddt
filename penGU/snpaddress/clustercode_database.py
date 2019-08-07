@@ -52,7 +52,7 @@ def generate_clustercode(insert_dict):
 
     return clustercode
 
-def clean_snapperdb_data(config_dict, snapperdb_config_dict):
+def clean_snapperdb_data(config_dict, snapperdb_config_dict, snapperdb_refgenome):
     snp_address_freq = retrieve_snp_addresses_from_snapperdb(snapperdb_config_dict)
     
     insert_dict_list = []
@@ -61,12 +61,12 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict):
         
         insert_dict = json.loads(address)
         insert_dict["clustercode_frequency"] = freq
-        insert_dict["reference_name"] = snapperdb_config_dict["reference_genome"]
+        insert_dict["reference_name"] = snapperdb_refgenome
         insert_dict["clustercode_updated"] = datetime.datetime.now()
 
         insert_dict["clustercode"] = generate_clustercode(insert_dict)
         
-        insert_dict["snpaddress_string"] = ''.join(str(x) for x in list(json.loads(address).values()))
+        insert_dict["snpaddress_string"] = snapperdb_refgenome + ''.join(str(x) for x in list(json.loads(address).values()))
         
         insert_dict_list.append(insert_dict)
 
@@ -74,11 +74,11 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict):
 
     return insert_dict_list
 
-def update_clustercode_database(config_dict, snapperdb_conf):
+def update_clustercode_database(config_dict, snapperdb_conf, snapperdb_refgenome):
     
     snapperdb_config_dict = check_config(snapperdb_conf, config_type="snapperdb")
     
-    insert_dict_list = clean_snapperdb_data(config_dict, snapperdb_config_dict)
+    insert_dict_list = clean_snapperdb_data(config_dict, snapperdb_config_dict, snapperdb_refgenome)
      
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
@@ -86,7 +86,7 @@ def update_clustercode_database(config_dict, snapperdb_conf):
 
     try:
         for row in insert_dict_list:
-
+            
             ## Does snpaddress exist in DB? If yes UPDATE if no INSERT
             sql = """SELECT id,clustercode_frequency FROM clustercode_snpaddress WHERE 
                            snpaddress_string = %(snpaddress_string)s 
@@ -105,6 +105,8 @@ def update_clustercode_database(config_dict, snapperdb_conf):
                             AND reference_name = %(reference_name)s"""
 
                     cur.execute(sql, (row))
+                elif res['clustercode_frequency'] is not None and row['clustercode_frequency'] is res['clustercode_frequency']:
+                    print("Not updating clustercode database, clustercode {clustercode} frequency ({clustercode_frequency!s}) is unchanged".format(**row))
             
             elif res is None:
                 print("Adding clustercode {clustercode} to database".format(**row))

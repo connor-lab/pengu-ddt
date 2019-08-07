@@ -31,7 +31,6 @@ def parse_config(config, config_type):
             config_dict['pg_pword'] = config_dict_raw.get('password')
             config_dict['pg_host'] = config_dict_raw.get('host')
             config_dict['pg_port'] = config_dict_raw.get('port', '5432')
-            config_dict['reference_genome'] = config_dict_raw.get('refgenome')
 
 
     except IOError:
