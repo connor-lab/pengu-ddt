@@ -68,7 +68,6 @@ create table clustercode_snpaddress(
     t25 int not null,
     t10 int not null,
     t5 int not null,
-    snpaddress_string text unique not null,
     created_at timestamp default current_timestamp,
     clustercode_updated timestamp not null
     );

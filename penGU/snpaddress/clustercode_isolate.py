@@ -12,8 +12,9 @@ def get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list):
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    isolate_snpaddress_dict = {}
+    isolate_snpaddress_dict_list = []
     for isolate in isolate_list:
+        isolate_snpaddress_dict = {}
         sql = """SELECT t250,t100,t50,t25,t10,t5 FROM sample_clusters WHERE 
                                fk_sample_id = (
                                    SELECT pk_id FROM samples WHERE
@@ -30,16 +31,19 @@ def get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list):
                 if re.match("^t\\d{1,3}$", i):
                     address.append(s[i])
         
-            address_string = ''.join(str(a) for a in address)
-            isolate_snpaddress_dict[isolate] = address_string
-    
+            address_string = '.'.join(str(a) for a in address)
+            
+            isolate_snpaddress_dict["sample"] = isolate
+            isolate_snpaddress_dict["clustercode"] = snapperdb_config_dict["pg_dbname"] + "." + address_string
+            isolate_snpaddress_dict_list.append(isolate_snpaddress_dict)
+
     dict_cur.close()
     conn.close()
-    
-    return isolate_snpaddress_dict
+
+    return isolate_snpaddress_dict_list
         
 
-def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict):
+def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict_list):
     """Is it frequency == 1, if so assign clustercode = S"""
 
     NGSdb = NGSDatabase(config_dict)
@@ -47,18 +51,19 @@ def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict):
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     insert_dict_list = []
-    for isolate,snpaddress in isolate_snpaddress_dict.items():
+    for row in isolate_snpaddress_dict_list:
+        
         insert_dict = {}
         
-        sql = """SELECT clustercode_frequency, snpaddress_string, clustercode 
+        sql = """SELECT clustercode_frequency, clustercode 
                 FROM clustercode_snpaddress WHERE 
-                snpaddress_string = %s """
-        dict_cur.execute(sql, (snpaddress, ))
+                clustercode = %(clustercode)s """
+        dict_cur.execute(sql, (row))
         
         s = dict_cur.fetchone()
 
         if s is None:
-            print("Couldn't find snpaddress {} in database: {}". format(snpaddress, config_dict["pg_dbname"]))
+            print("Couldn't find clustercode {} in database: {}". format(row["clustercode"], config_dict["pg_dbname"]))
 
         elif s is not None:
 
@@ -68,7 +73,7 @@ def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict):
                 insert_dict["clustercode"] = s["clustercode"]
 
             insert_dict["clustercode_updated"] = datetime.datetime.now()
-            insert_dict["y_number"] = isolate
+            insert_dict["y_number"] = row["sample"]
             
             insert_dict_list.append(insert_dict)
 
@@ -81,8 +86,9 @@ def find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict):
 def update_isolate_clustercode_db(config_dict, snapperdb_conf, isolate_file):
     snapperdb_config_dict = check_config(snapperdb_conf, config_type="snapperdb")
     isolate_list = read_lines_from_isolate_data(isolate_file)
-    isolate_snpaddress_dict = get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list)
-    insert_dict_list = find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict)
+    isolate_snpaddress_dict_list = get_snpaddress_from_snapperdb(snapperdb_config_dict, isolate_list)
+
+    insert_dict_list = find_snpaddress_string_in_pengudb(config_dict, isolate_snpaddress_dict_list)
     
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()

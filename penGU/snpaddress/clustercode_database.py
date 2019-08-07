@@ -33,7 +33,6 @@ def create_singleton_clustercode(insert_dict):
             singleton_dict[key] = 0
     
     singleton_dict["reference_name"] = "SINGLETON"
-    singleton_dict["snpaddress_string"] = "000000"
     singleton_dict["clustercode"] = "S"
     singleton_dict["clustercode_updated"] = datetime.datetime.now()
     singleton_dict["clustercode_frequency"] = None
@@ -66,8 +65,6 @@ def clean_snapperdb_data(config_dict, snapperdb_config_dict, snapperdb_refgenome
 
         insert_dict["clustercode"] = generate_clustercode(insert_dict)
         
-        insert_dict["snpaddress_string"] = snapperdb_refgenome + ''.join(str(x) for x in list(json.loads(address).values()))
-        
         insert_dict_list.append(insert_dict)
 
     insert_dict_list.append(create_singleton_clustercode(insert_dict))
@@ -89,8 +86,7 @@ def update_clustercode_database(config_dict, snapperdb_conf, snapperdb_refgenome
             
             ## Does snpaddress exist in DB? If yes UPDATE if no INSERT
             sql = """SELECT id,clustercode_frequency FROM clustercode_snpaddress WHERE 
-                           snpaddress_string = %(snpaddress_string)s 
-                           AND reference_name = %(reference_name)s"""
+                           clustercode = %(clustercode)s"""
 
             cur.execute(sql,(row))
             res = cur.fetchone()
@@ -101,8 +97,7 @@ def update_clustercode_database(config_dict, snapperdb_conf, snapperdb_refgenome
                     sql = """UPDATE clustercode_snpaddress
                             SET clustercode_frequency = %(clustercode_frequency)s,
                             clustercode_updated = %(clustercode_updated)s
-                            WHERE snpaddress_string = %(snpaddress_string)s 
-                            AND reference_name = %(reference_name)s"""
+                            WHERE clustercode = %(clustercode)s"""
 
                     cur.execute(sql, (row))
                 elif res['clustercode_frequency'] is not None and row['clustercode_frequency'] is res['clustercode_frequency']:
@@ -120,12 +115,10 @@ def update_clustercode_database(config_dict, snapperdb_conf, snapperdb_refgenome
                         t25,
                         t10,
                         t5,
-                        snpaddress_string,
                         clustercode_updated)
                         VALUES (%(clustercode)s, %(clustercode_frequency)s, 
                         %(reference_name)s, %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
-                        %(t10)s, %(t5)s, %(snpaddress_string)s, 
-                        %(clustercode_updated)s);
+                        %(t10)s, %(t5)s, %(clustercode_updated)s);
                         """
                 cur.execute(sql, row)
         
