@@ -12,7 +12,6 @@ from penGU.mlst.db_record import update_mlst_database
 from penGU.distance.update_refdb import update_distance_refdb
 from penGU.distance.db_record import update_distance_database
 
-from penGU.snpaddress.clustercode_database import update_clustercode_database
 from penGU.snpaddress.clustercode_isolate import update_isolate_clustercode_db
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
@@ -43,10 +42,7 @@ def run_commmand(config_dict, args):
         update_distance_database(config_dict, args.dist_csv)
 
     elif 'update_clustercode_db' in args.command:
-        update_clustercode_database(config_dict, args.snapperdb_conf, args.snapperdb_refgenome)
-        updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_conf, args.isolate_file)
+        updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_conf, args.snapperdb_refgenome, args.isolate_file)
         if updated_records:
             update_clustercode_history(config_dict, updated_records)
             write_updated_records_to_csv(updated_records, args.output_csv)
-    
-    #elif 'update_isolate_clustercode_db' in args.command:
