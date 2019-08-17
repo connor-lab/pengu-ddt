@@ -12,10 +12,11 @@ from penGU.mlst.db_record import update_mlst_database
 from penGU.distance.update_refdb import update_distance_refdb
 from penGU.distance.db_record import update_distance_database
 
-from penGU.snpaddress.clustercode_isolate import update_isolate_clustercode_db
+from penGU.snpaddress.clustercode_isolate import update_isolate_clustercode_db, get_snpaddresses_from_snapperdb
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
-from penGU.output.utils import write_updated_records_to_csv
+from penGU.input.utils import check_config
+from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv
 
 
 def run_commmand(config_dict, args):
@@ -46,3 +47,8 @@ def run_commmand(config_dict, args):
         if updated_records:
             update_clustercode_history(config_dict, updated_records)
             write_updated_records_to_csv(updated_records, args.output_csv)
+
+        if args.output_all:
+            snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
+            all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, args.snapperdb_refgenome)
+            write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)

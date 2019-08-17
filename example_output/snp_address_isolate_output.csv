@@ -1,4 +1,4 @@
-y_number,old_clustercode,new_clustercode
-GCF_000009205-2,NA,RT106_Liv22.2.2.2.2.2.2
-GCF_000009205-2-200,NA,RT106_Liv22.2.2.2.2.2.2
-GCF_000009205-2-225,NA,RT106_Liv22.2.2.2.2.2.2
+y_number,old_clustercode,new_clustercode,new_clustercode_frequency,new_data
+GCF_000009205-2,NA,RT106_Liv22.2.2.2.2.2.2,3,TRUE
+GCF_000009205-2-200,NA,RT106_Liv22.2.2.2.2.2.2,3,TRUE
+GCF_000009205-2-225,NA,RT106_Liv22.2.2.2.2.2.2,3,TRUE

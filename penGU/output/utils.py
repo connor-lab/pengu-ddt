@@ -14,3 +14,13 @@ def write_updated_records_to_csv(updated_records, output_csv):
                 row["old_clustercode"] = "NA"
             
             writer.writerow(row)
+
+def write_all_records_to_csv(records, output_csv):
+    with open(output_csv, 'w') as csvfile:
+        fieldnames = records[0].keys()
+
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        sorted_records = sorted(records, key=lambda x: ( x['clustercode'] is None, x['clustercode']))
+        for row in sorted_records:            
+            writer.writerow(row)

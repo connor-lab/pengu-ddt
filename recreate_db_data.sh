@@ -17,4 +17,5 @@ echo "drop database digest;" | psql -h localhost -U postgres
 ./pengu-ddt -c example_config/example.cfg update_clustercode_db -i example_data/snp_address_isolate_data.txt \
             -a "host=localhost user=snapperdb password=snapperdb dbname=RT106_Liv22" \
             -g RT106_Liv22 \
-            -o example_output/snp_address_isolate_output.csv
+            -o example_output/snp_address_isolate_output.csv \
+	    -oa example_output/all_snp_addresses.csv 

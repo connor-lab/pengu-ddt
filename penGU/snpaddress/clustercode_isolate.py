@@ -144,7 +144,7 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, refname, isolate_
                     dict_cur.execute(sql, row)
             
                 if updated:
-                    modified_records.append(updated)
+                    modified_records.append(updated)              
         
         conn.commit()
         dict_cur.close()
