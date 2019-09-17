@@ -22,6 +22,8 @@ def read_data_from_csv(csv_file, header=None, **kwargs):
     row_list = []
     if "field_sep" not in kwargs.keys():
         field_sep = ','
+    else:
+        field_sep = kwargs.get("field_sep")
     with open(path_to_csv, mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=field_sep, fieldnames=header)
         for record in csv_reader:
