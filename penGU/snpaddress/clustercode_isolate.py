@@ -7,10 +7,19 @@ from penGU.db.NGSDatabase import NGSDatabase
 from penGU.input.utils import check_config, read_lines_from_isolate_data
 from penGU.snpaddress.clustercode_database import update_clustercode_database
 
+def filter_snpaddress_levels(level, level_list):
+    if level in level_list:
+        return True
+    else:
+        return False
+
+
 def get_clustercode_counts(clustercode_dict_list):
     
     clustercodes = []
     for row in clustercode_dict_list:
+        if row["y_number"] in row["reference_name"]:
+            row["clustercode"] = "NA"
         clustercodes.append(row['clustercode'])
 
     clustercode_counts = Counter(clustercodes)
@@ -27,8 +36,10 @@ def assign_singleton_clustercodes(clustercode_dict_list):
     singleton_clustercode_dict_list = []
 
     for row in clustercode_dict_list:
-        if row['clustercode_frequency'] == 1:
+        if row['clustercode_frequency'] == 1 and "NA" not in row['clustercode']:
             row['clustercode'] = "S"
+        #elif "NA" in row['clustercode']:
+        #    row['clustercode'] = "NA" 
         singleton_clustercode_dict_list.append(row)
 
     return singleton_clustercode_dict_list
@@ -40,7 +51,7 @@ def get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname):
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    sql = """SELECT fk_sample_id,t250,t100,t50,t25,t10,t5 FROM sample_clusters"""
+    sql = """SELECT fk_sample_id,t250,t100,t50,t25,t10,t5,t2,t0 FROM sample_clusters"""
     dict_cur.execute(sql)
     db_snpaddress = dict_cur.fetchall()
         
@@ -72,33 +83,35 @@ def get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname):
             if re.match("^t\\d{1,3}$", level):
                 sample_clustercode[level] = value
                 address.append(sample[level])
-            address_string = '.'.join(str(a) for a in address)
+                
+                if filter_snpaddress_levels(level, ['t250', 't100', 't50', 't25', 't10', 't5']):
+                    address_string = '.'.join(str(a) for a in address)
         
         sample_clustercode["y_number"] = sample.get("y_number")
         sample_clustercode["clustercode"] = refname + "." + address_string
         sample_clustercode["reference_name"] = refname
+
         clustercode_dict_list.append(sample_clustercode)
     
     isolate_snpaddress_dict_list = get_clustercode_counts(clustercode_dict_list)
-
-    update_clustercode_database(config_dict, isolate_snpaddress_dict_list)
 
     singleton_isolate_snpaddress_dict_list = assign_singleton_clustercodes(isolate_snpaddress_dict_list)
 
     return singleton_isolate_snpaddress_dict_list
         
 
-def update_isolate_clustercode_db(config_dict, snapperdb_conf, refname, isolate_list_file):
-    snapperdb_config = check_config(snapperdb_conf, config_type="snapperdb")
-    isolate_snpaddress_dict_list = get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname)
-
+def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapperdb_addresses):
+    #snapperdb_config = check_config(snapperdb_conf, config_type="snapperdb")
+    #isolate_snpaddress_dict_list = get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname)
+    #print(isolate_snpaddress_dict_list)
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
         modified_records = []
-        for row in isolate_snpaddress_dict_list:
+        for row in snapperdb_addresses:
+            
             if row["y_number"] != row["reference_name"]:
                 row["clustercode_updated"] = datetime.datetime.now()
                 updated = {}
@@ -136,13 +149,24 @@ def update_isolate_clustercode_db(config_dict, snapperdb_conf, refname, isolate_
                     print("Adding isolate {} to database with clustercode {}".format(row["y_number"], row["clustercode"]))
                 
                     sql = """INSERT INTO clustercode
-                            (y_number,
-                            clustercode, 
-                            clustercode_updated)
-                            VALUES (%(y_number)s, %(clustercode)s, %(clustercode_updated)s);"""
-                
+                        (clustercode, 
+                        y_number,
+                        t250,
+                        t100,
+                        t50,
+                        t25,
+                        t10,
+                        t5,
+                        t2,
+                        t0,
+                        clustercode_updated)
+                        VALUES (%(clustercode)s, %(y_number)s,
+                        %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
+                        %(t10)s, %(t5)s, %(t2)s, %(t0)s,
+                        %(clustercode_updated)s);
+                        """
                     dict_cur.execute(sql, row)
-            
+
                 if updated:
                     modified_records.append(updated)              
         
