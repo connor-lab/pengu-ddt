@@ -20,7 +20,7 @@ def parse_mlst_csv(csv_file):
                  "locus_5", 
                  "locus_6", 
                  "locus_7"]
-    mlst_data = read_data_from_csv(csv_file, header=mlst_cols)
+    mlst_data = read_data_from_csv(csv_file, header=mlst_cols, field_sep="\t")
     mlst_data_clean = []
     for row in mlst_data:
         row["isolate"] = os.path.splitext(os.path.basename(row["isolate"]))[0]
