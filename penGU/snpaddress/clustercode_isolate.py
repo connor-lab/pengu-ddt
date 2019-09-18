@@ -51,32 +51,16 @@ def get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname):
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    sql = """SELECT fk_sample_id,t250,t100,t50,t25,t10,t5,t2,t0 FROM sample_clusters"""
+    sql = """SELECT sample_name,t250,t100,t50,t25,t10,t5,t2,t0 FROM samples, sample_clusters WHERE samples.pk_id = sample_clusters.fk_sample_id"""
     dict_cur.execute(sql)
     db_snpaddress = dict_cur.fetchall()
         
-    sql = """SELECT pk_id,sample_name FROM samples"""
-    dict_cur.execute(sql)
-    db_samplename = dict_cur.fetchall()
-
     dict_cur.close()
     conn.close()
 
-    db_snpaddress_sorted = sorted(db_snpaddress, key=lambda k: k['fk_sample_id']) 
-    db_samplename_sorted = sorted(db_samplename, key=lambda k: k['pk_id']) 
-
-    sample_address_dict_list = []
-
-    for address,sample in zip(db_snpaddress_sorted, db_samplename_sorted):
-        sample_address = address
-        if address['fk_sample_id'] == sample['pk_id']:
-            del sample_address['fk_sample_id']
-            sample_address['y_number'] = sample['sample_name']
-            sample_address_dict_list.append(sample_address)
-
     
     clustercode_dict_list = []
-    for sample in sample_address_dict_list:
+    for sample in db_snpaddress:
         sample_clustercode = {} 
         address = []
         for level,value in sample.items():
@@ -87,7 +71,7 @@ def get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname):
                 if filter_snpaddress_levels(level, ['t250', 't100', 't50', 't25', 't10', 't5']):
                     address_string = '.'.join(str(a) for a in address)
         
-        sample_clustercode["y_number"] = sample.get("y_number")
+        sample_clustercode["y_number"] = sample.get("sample_name")
         sample_clustercode["clustercode"] = refname + "." + address_string
         sample_clustercode["reference_name"] = refname
 
