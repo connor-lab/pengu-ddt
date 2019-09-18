@@ -15,8 +15,6 @@ def update_isolate_database(config_dict, isolate_csv):
     
         # Add csv data in one chunk then commit once and close connection
         isolate_data_list = read_data_from_csv(isolate_csv)
-        isolate_data_list.append( { "y_number" : "NA", "episode_number" : None } )
-
         
         for record in isolate_data_list:
 
