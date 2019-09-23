@@ -45,7 +45,7 @@ def assign_singleton_clustercodes(clustercode_dict_list):
     return singleton_clustercode_dict_list
 
 
-def get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname):
+def get_snpaddresses_from_snapperdb(snapperdb_config, refname):
     
     NGSdb = NGSDatabase(snapperdb_config)
     conn = NGSdb._connect_to_db()

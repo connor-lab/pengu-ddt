@@ -45,16 +45,17 @@ def run_commmand(config_dict, args):
 
     elif 'update_clustercode_db' in args.command:
         snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
-        all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, args.snapperdb_refgenome)
-        update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
+        all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, args.snapperdb_refgenome)
 
         if args.output_all:
             write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)
 
-        updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_refgenome, args.isolate_file, all_snapperdb_snpaddresses)
-        if updated_records:
-        #    update_clustercode_history(config_dict, updated_records)
-            write_updated_records_to_csv(updated_records, args.output_csv)
+        if args.isolate_file and args.output_csv:
+            update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
+            updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_refgenome, args.isolate_file, all_snapperdb_snpaddresses)
+            if updated_records:
+                update_clustercode_history(config_dict, updated_records)
+                write_updated_records_to_csv(updated_records, args.output_csv)
 
         #
         #    snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
