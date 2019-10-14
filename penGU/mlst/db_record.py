@@ -47,9 +47,11 @@ def update_mlst_database(config_dict, csv_file):
         for row in mlst_data_clean:
 
             sql = """INSERT INTO mlst
-                    (y_number, st, locus_1, locus_2, locus_3, 
+                    (fk_isolate_ID, fk_ST_ID, locus_1, locus_2, locus_3, 
                     locus_4, locus_5, locus_6, locus_7) VALUES 
-                    (%(isolate)s, %(ST)s, %(locus_1)s, %(locus_2)s, 
+                    ((SELECT pk_ID from isolate WHERE y_number = %(isolate)s),
+                    (SELECT pk_ID from mlst_sequence_types WHERE ST = %(ST)s),
+                    %(locus_1)s, %(locus_2)s, 
                     %(locus_3)s, %(locus_4)s, %(locus_5)s, 
                     %(locus_6)s, %(locus_7)s);"""
 

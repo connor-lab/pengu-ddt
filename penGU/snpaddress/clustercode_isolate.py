@@ -100,12 +100,19 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                 row["clustercode_updated"] = datetime.datetime.now()
                 updated = {}
                 ## Does isolate exist in DB? If yes UPDATE if no INSERT
-                dict_cur.execute("""SELECT y_number,clustercode FROM clustercode WHERE 
-                               y_number = %(y_number)s""", (row))
-            
+                sql = """SELECT isolate.y_number,
+                      clustercode_snpaddress.clustercode,
+                      clustercode_snpaddress.wg_number 
+                      FROM isolate,clustercode_snpaddress WHERE
+                      clustercode_snpaddress.pk_ID = (
+                      SELECT fk_clustercode_ID FROM clustercode WHERE fk_isolate_ID = (
+                      SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s))"""
+                dict_cur.execute(sql, row)
+
                 s = dict_cur.fetchone()
 
                 if s is not None:
+                    
                     if s["clustercode"] != row["clustercode"]:
                         updated["y_number"] = row["y_number"]
                         updated["old_clustercode"] = s["clustercode"]
@@ -115,9 +122,10 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                         print("Updating clustercode of isolate {} from {} to {}".format(row["y_number"], s["clustercode"], row["clustercode"]))
                     
                         sql = """UPDATE clustercode
-                                SET clustercode = %(clustercode)s,
+                                SET fk_clustercode_ID = (
+                                    SELECT pk_ID FROM clustercode_snpaddress WHERE clustercode = %(clustercode)s),
                                 clustercode_updated = %(clustercode_updated)s
-                                WHERE y_number = %(y_number)s"""
+                                WHERE fk_isolate_ID = (SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s)"""
 
                         dict_cur.execute(sql, (row))
 
@@ -133,8 +141,8 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                     print("Adding isolate {} to database with clustercode {}".format(row["y_number"], row["clustercode"]))
                 
                     sql = """INSERT INTO clustercode
-                        (clustercode, 
-                        y_number,
+                        (fk_clustercode_ID, 
+                        fk_isolate_ID,
                         t250,
                         t100,
                         t50,
@@ -144,7 +152,9 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                         t2,
                         t0,
                         clustercode_updated)
-                        VALUES (%(clustercode)s, %(y_number)s,
+                        VALUES (
+                            (SELECT pk_ID from clustercode_snpaddress WHERE clustercode = %(clustercode)s),
+                            (SELECT pk_ID from isolate WHERE y_number = %(y_number)s),
                         %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
                         %(t10)s, %(t5)s, %(t2)s, %(t0)s,
                         %(clustercode_updated)s);
@@ -170,3 +180,95 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
 
     except psycopg2.IntegrityError as e:
             print(e)
+
+
+def get_all_clustercode_data(config_dict, records=None):
+
+    y_number_regex = re.compile("^\\d{4}-\\d{6}")
+
+    NGSdb = NGSDatabase(config_dict)
+    conn = NGSdb._connect_to_db()
+    dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    if records:
+        try:
+            all_clustercode_data = []
+            for record in records:
+
+                sql = """SELECT i.y_number,
+                c.t250,
+                c.t100,
+                c.t50,
+                c.t25,
+                c.t10,
+                c.t5,
+                c.t2,
+                c.t0,
+                cs.wg_number,
+                cs.clustercode FROM isolate i 
+                JOIN clustercode c 
+                ON i.pk_ID = c.fk_isolate_ID 
+                JOIN clustercode_snpaddress cs 
+                ON c.fk_clustercode_ID = cs.pk_ID 
+                WHERE y_number = %(y_number)s"""
+
+                dict_cur.execute(sql, record)
+
+                s = dict_cur.fetchone()
+
+                s['old_clustercode'] = record['old_clustercode']
+                s['new_clustercode'] = s.pop('clustercode')
+                s['new_data'] = record['new_data']
+
+                all_clustercode_data.append(s)
+
+        except psycopg2.IntegrityError as e:
+            print(e)
+
+    else:
+        try:
+
+            sql = """SELECT i.y_number,
+                    c.t250,
+                    c.t100,
+                    c.t50,
+                    c.t25,
+                    c.t10,
+                    c.t5,
+                    c.t2,
+                    c.t0,
+                    cs.wg_number,
+                    cs.clustercode, 
+                    cs.reference_name FROM isolate i 
+                    JOIN clustercode c 
+                    ON i.pk_ID = c.fk_isolate_ID 
+                    JOIN clustercode_snpaddress cs 
+                    ON c.fk_clustercode_ID = cs.pk_ID """
+    
+            dict_cur.execute(sql)
+    
+            all_clustercode_data = dict_cur.fetchall()
+        
+        except psycopg2.IntegrityError as e:
+            print(e)
+
+    
+    dict_cur.close()
+    conn.close()
+
+    for record in all_clustercode_data:
+
+        y_number_rev = record['y_number'][::-1]
+
+        if y_number_regex.match(y_number_rev):
+            y_number_datetime = y_number_rev.split("_")[0]
+            record['pipeline_time'] = y_number_datetime.split("-")[0][::-1]
+            record['pipeline_date'] = datetime.datetime.strptime(y_number_datetime.split("-")[1][::-1], "%y%m%d").strftime("%Y-%m-%d")
+            record['y_number'] = "".join(y_number_rev.split("_")[1:])[::0-1]
+    
+
+
+    
+    return all_clustercode_data
+
+    

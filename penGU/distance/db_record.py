@@ -30,12 +30,13 @@ def update_distance_database(config_dict, dist_csv):
         for row in dist_data_clean:
             
             sql = """INSERT INTO reference_distance
-                       (y_number,
-                       reference_name, 
+                       (fk_isolate_ID,
+                       fk_reference_ID, 
                        reference_mash_distance, 
                        reference_mash_p_value,
                        reference_common_kmers)
-                       VALUES (%(y_number)s, %(reference_name)s, 
+                       VALUES ((SELECT pk_ID from isolate WHERE y_number = %(y_number)s),
+                       (SELECT pk_ID from reference_metadata WHERE reference_name = %(reference_name)s), 
                        %(reference_mash_distance)s, %(reference_mash_p_value)s, 
                        %(reference_common_kmers)s);"""
 

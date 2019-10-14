@@ -2,9 +2,21 @@ import csv
 import os
 import sys
 
+def make_fieldnames(csv_data):
+    fieldnames = []
+    
+    for record in csv_data:
+        for key in record:
+            if key not in fieldnames:
+                fieldnames.append(key)
+
+    return fieldnames
+
 def write_updated_records_to_csv(updated_records, output_csv):
+
+    fieldnames = make_fieldnames(updated_records)
+
     with open(output_csv, 'w') as csvfile:
-        fieldnames = updated_records[0].keys()
 
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -16,8 +28,9 @@ def write_updated_records_to_csv(updated_records, output_csv):
             writer.writerow(row)
 
 def write_all_records_to_csv(records, output_csv):
+    fieldnames = make_fieldnames(records)
+
     with open(output_csv, 'w') as csvfile:
-        fieldnames = records[0].keys()
 
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()

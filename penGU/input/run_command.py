@@ -12,7 +12,7 @@ from penGU.mlst.db_record import update_mlst_database
 from penGU.distance.update_refdb import update_distance_refdb
 from penGU.distance.db_record import update_distance_database
 
-from penGU.snpaddress.clustercode_isolate import get_snpaddresses_from_snapperdb, update_isolate_clustercode_db
+from penGU.snpaddress.clustercode_isolate import get_snpaddresses_from_snapperdb, update_isolate_clustercode_db, get_all_clustercode_data
 from penGU.snpaddress.clustercode_database import update_clustercode_database
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
@@ -43,21 +43,22 @@ def run_commmand(config_dict, args):
     elif 'update_distance_db' in args.command:
         update_distance_database(config_dict, args.dist_csv)
 
+    elif 'dump_all_clustercodes' in args.command:
+        all_snapperdb_snpaddresses = get_all_clustercode_data(config_dict)
+        write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)
+
     elif 'update_clustercode_db' in args.command:
         snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
         all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, args.snapperdb_refgenome)
+        
 
-        if args.output_all:
-            write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)
+        #if args.output_all:
+        #    write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)
 
-        if args.isolate_file and args.output_csv:
-            update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
-            updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_refgenome, args.isolate_file, all_snapperdb_snpaddresses)
-            if updated_records:
-                update_clustercode_history(config_dict, updated_records)
-                write_updated_records_to_csv(updated_records, args.output_csv)
-
-        #
-        #    snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
-        #    all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, args.snapperdb_refgenome)
-        #   
+        #if args.isolate_file and args.output_csv:
+        update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
+        updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_refgenome, args.isolate_file, all_snapperdb_snpaddresses)
+        if updated_records:
+            update_clustercode_history(config_dict, updated_records)
+            all_data_records = get_all_clustercode_data(config_dict, updated_records)
+            write_updated_records_to_csv(all_data_records, args.output_csv)

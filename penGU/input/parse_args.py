@@ -37,13 +37,17 @@ def parse_commandline_args():
     update_distance_db_parser = subparsers.add_parser('update_distance_db')
     update_distance_db_parser.add_argument('-d', '--distance_csv', dest='dist_csv', required=True, help="csv containing isolate mash distance data")
 
+    # Dump all clustercode data
+    dump_all_clustercodes_parser = subparsers.add_parser('dump_all_clustercodes')
+    dump_all_clustercodes_parser.add_argument('-oa', '--output_all', dest='output_all', required=True, help="Output csv for all SNP addresses in database")
+    
     # Update clustercode database
     update_clustercode_db_parser = subparsers.add_parser('update_clustercode_db')
     update_clustercode_db_parser.add_argument('-a', '--snapperdb_conf', dest='snapperdb_conf', required=True, help="Snapper3 connection string 'host= dbname= user= password= '")
-    update_clustercode_db_parser.add_argument('-i', '--isolate_file', dest='isolate_file', required=False, help="textfile of y_numbers for isolate")
+    update_clustercode_db_parser.add_argument('-i', '--isolate_file', dest='isolate_file', required=True, help="textfile of y_numbers for isolate")
     update_clustercode_db_parser.add_argument('-g', '--reference_name', dest='snapperdb_refgenome', required=True, help="Name of reference genome in snapperDB")
-    update_clustercode_db_parser.add_argument('-o', '--output_csv', dest='output_csv', required=False, help="output csv containing updated snp addresses")
-    update_clustercode_db_parser.add_argument('-oa', '--output_all', dest='output_all', required=False, help="Output csv for all SNP addresses in database")
+    update_clustercode_db_parser.add_argument('-o', '--output_csv', dest='output_csv', required=True, help="output csv containing updated snp addresses")
+    
     
 
     # Parse args

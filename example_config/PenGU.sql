@@ -1,12 +1,12 @@
 create table isolate(
-	ID serial primary key not null,
+	pk_ID serial primary key not null,
 	y_number text unique not null,
 	episode_number text
     );
 
 create table sequencing(
-	ID SERIAL primary key not null,
-	y_number text not null references isolate(y_number),
+	pk_ID SERIAL primary key not null,
+	fk_isolate_ID int not null references isolate(pk_ID),
 	sequencing_instrument text,
 	sequencing_run text,
 	sequencing_start_date date,
@@ -19,7 +19,7 @@ create table sequencing(
     );
 
 create table mlst_scheme_metadata(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     pubmlst_name text unique not null,
     pubmlst_url text unique not null,
     pubmlst_updated_at TIMESTAMP not null,
@@ -33,7 +33,8 @@ create table mlst_scheme_metadata(
     );
     
 create table mlst_sequence_types(
-    ST text primary key unique not null,
+    pk_ID SERIAL primary key not null,
+    ST text unique not null,
     locus_1 text,
     locus_2 text,
     locus_3 text,
@@ -44,9 +45,9 @@ create table mlst_sequence_types(
     );
 
 create table mlst(
-    ID SERIAL primary key not null,
-    y_number text not null references isolate(y_number),
-    ST text references mlst_sequence_types(ST),
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
+    fk_ST_ID int references mlst_sequence_types(pk_ID),
     locus_1 text,
     locus_2 text,
     locus_3 text,
@@ -58,8 +59,9 @@ create table mlst(
     );
 
 create table clustercode_snpaddress(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     clustercode text UNIQUE not null,
+    wg_number text UNIQUE not null,
     reference_name text not null,
     clustercode_frequency int not null,
     updated_at timestamp not null,
@@ -67,8 +69,8 @@ create table clustercode_snpaddress(
     );
 
 create table clustercode(
-    ID SERIAL primary key not null,
-    y_number text not null references isolate(y_number),
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
     t250 int not null,
     t100 int not null,
     t50 int not null,
@@ -77,21 +79,21 @@ create table clustercode(
     t5 int not null,
     t2 int not null,
     t0 int not null,
-    clustercode text not null references clustercode_snpaddress(clustercode),
+    fk_clustercode_ID int not null references clustercode_snpaddress(pk_ID),
     created_at timestamp default current_timestamp,
     clustercode_updated timestamp not null
     );
 
 create table clustercode_history(
-    ID SERIAL primary key not null,
-    y_number text not null references isolate(y_number),
-    old_clustercode text not null references clustercode_snpaddress(clustercode),
-    new_clustercode text not null references clustercode_snpaddress(clustercode),
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
+    fk_old_clustercode_ID int not null references clustercode_snpaddress(pk_ID),
+    fk_new_clustercode_ID int not null references clustercode_snpaddress(pk_ID),
     created_at timestamp default current_timestamp
     );
 
 create table reference_metadata(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     reference_name text unique not null,
     snapperdb_db_name text unique not null,
     ncbi_accession text,
@@ -100,9 +102,9 @@ create table reference_metadata(
     );
 
 create table reference_distance(
-    ID SERIAL primary key not null,
-    y_number text not null references isolate(y_number),
-    reference_name text not null references reference_metadata(reference_name),
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
+    fk_reference_ID int not null references reference_metadata(pk_ID),
     reference_mash_distance decimal(11, 10),
     reference_mash_p_value text not null,
     reference_common_kmers text not null,
@@ -110,44 +112,44 @@ create table reference_distance(
     );
 
 create table ribotype_metadata(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     ribotype_reference_name text unique not null,
     ribotype text not null
     );
 
 create table ribotype_distance(
-    ID SERIAL primary key not null,
-    y_number text not null references isolate(y_number),
-    ribotype_reference_name text not null references ribotype_metadata(ribotype_reference_name),
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
+    fk_ribotype_reference_ID int not null references ribotype_metadata(pk_ID),
     ribotype text not null,
     ribotype_mash_distance decimal(11, 10)
     );
 
 create table toxinotype_db_tcda(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     sequence text unique not null
     );
 
 create table toxinotype_db_tcdb(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     sequence text unique not null
     );
 
 create table toxinotype_db_toxa(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     sequence text unique not null
     );
 
 create table toxinotype_db_toxb(
-    ID SERIAL primary key not null,
+    pk_ID SERIAL primary key not null,
     sequence text unique not null
     );
 
 create table toxinotype(
-    ID SERIAL primary key not null,
-    y_number text not null references isolate(y_number),
-    tox_a int references toxinotype_db_toxa(ID),
-    tox_b int references toxinotype_db_toxb(ID),
-    tcd_a int references toxinotype_db_tcda(ID),
-    tcd_b int references toxinotype_db_tcdb(ID)
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
+    fk_tox_a_ID int references toxinotype_db_toxa(pk_ID),
+    fk_tox_b_ID int references toxinotype_db_toxb(pk_ID),
+    fk_tcd_a_ID int references toxinotype_db_tcda(pk_ID),
+    fk_tcd_b_ID int references toxinotype_db_tcdb(pk_ID)
     );
