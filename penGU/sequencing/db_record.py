@@ -28,7 +28,7 @@ def update_sequencing_database(config_dict, csv_file):
             print("Adding {y_number} | {sequencing_run} to the sequencing database".format(**row))
 
             sql = """INSERT INTO sequencing 
-                           (y_number, 
+                           (fk_isolate_ID, 
                            sequencing_instrument, 
                            sequencing_run, 
                            sequencing_start_date, 
@@ -38,7 +38,7 @@ def update_sequencing_database(config_dict, csv_file):
                            mean_insert_size,
                            qc_pass) 
                            VALUES
-                           (%(y_number)s, 
+                           ((SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s), 
                            %(sequencing_instrument)s, 
                            %(sequencing_run)s, 
                            %(sequencing_start_date)s, 

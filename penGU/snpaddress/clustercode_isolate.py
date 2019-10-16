@@ -205,7 +205,8 @@ def get_all_clustercode_data(config_dict, records=None):
                 c.t2,
                 c.t0,
                 cs.wg_number,
-                cs.clustercode FROM isolate i 
+                cs.clustercode,
+                cs.reference_name FROM isolate i 
                 JOIN clustercode c 
                 ON i.pk_ID = c.fk_isolate_ID 
                 JOIN clustercode_snpaddress cs 
