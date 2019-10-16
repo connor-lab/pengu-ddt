@@ -196,6 +196,7 @@ def get_all_clustercode_data(config_dict, records=None):
             for record in records:
 
                 sql = """SELECT i.y_number,
+                i.original_ID,
                 c.t250,
                 c.t100,
                 c.t50,
@@ -230,6 +231,7 @@ def get_all_clustercode_data(config_dict, records=None):
         try:
 
             sql = """SELECT i.y_number,
+                    i.original_ID,
                     c.t250,
                     c.t100,
                     c.t50,
