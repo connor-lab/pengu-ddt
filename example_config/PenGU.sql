@@ -48,7 +48,7 @@ create table mlst_sequence_types(
 create table mlst(
     pk_ID SERIAL primary key not null,
     fk_isolate_ID int not null references isolate(pk_ID),
-    fk_ST_ID int references mlst_sequence_types(pk_ID),
+    fk_ST_ID int not null references mlst_sequence_types(pk_ID),
     locus_1 text,
     locus_2 text,
     locus_3 text,
