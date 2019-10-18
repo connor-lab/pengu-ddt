@@ -184,8 +184,6 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
 
 def get_all_clustercode_data(config_dict, records=None):
 
-    y_number_regex = re.compile("^\\d{4}-\\d{6}")
-
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -259,6 +257,8 @@ def get_all_clustercode_data(config_dict, records=None):
     dict_cur.close()
     conn.close()
 
+    y_number_regex = re.compile("^\\d{4}-\\d{6}")
+
     for record in all_clustercode_data:
 
         y_number_rev = record['y_number'][::-1]
@@ -266,7 +266,7 @@ def get_all_clustercode_data(config_dict, records=None):
         if y_number_regex.match(y_number_rev):
             y_number_datetime = y_number_rev.split("_")[0]
             record['pipeline_time'] = y_number_datetime.split("-")[0][::-1]
-            record['pipeline_date'] = datetime.datetime.strptime(y_number_datetime.split("-")[1][::-1], "%y%m%d").strftime("%Y-%m-%d")
+            record['pipeline_date'] = y_number_datetime.split("-")[1][::-1]
             record['y_number'] = "".join(y_number_rev.split("_")[1:])[::0-1]
     
 
