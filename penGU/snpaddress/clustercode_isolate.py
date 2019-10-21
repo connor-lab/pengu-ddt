@@ -102,7 +102,8 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                 ## Does isolate exist in DB? If yes UPDATE if no INSERT
                 sql = """SELECT isolate.y_number,
                       clustercode_snpaddress.clustercode,
-                      clustercode_snpaddress.wg_number 
+                      clustercode_snpaddress.wg_number,
+                      clustercode_snpaddress.clustercode_frequency
                       FROM isolate,clustercode_snpaddress WHERE
                       clustercode_snpaddress.pk_ID = (
                       SELECT fk_clustercode_ID FROM clustercode WHERE fk_isolate_ID = (
@@ -205,7 +206,9 @@ def get_all_clustercode_data(config_dict, records=None):
                 c.t0,
                 cs.wg_number,
                 cs.clustercode,
-                cs.reference_name FROM isolate i 
+                cs.reference_name,
+                cs.clustercode_frequency
+                FROM isolate i 
                 JOIN clustercode c 
                 ON i.pk_ID = c.fk_isolate_ID 
                 JOIN clustercode_snpaddress cs 
@@ -240,7 +243,9 @@ def get_all_clustercode_data(config_dict, records=None):
                     c.t0,
                     cs.wg_number,
                     cs.clustercode, 
-                    cs.reference_name FROM isolate i 
+                    cs.reference_name,
+                    cs.clustercode_frequency
+                    FROM isolate i 
                     JOIN clustercode c 
                     ON i.pk_ID = c.fk_isolate_ID 
                     JOIN clustercode_snpaddress cs 
