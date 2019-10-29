@@ -144,6 +144,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                     sql = """INSERT INTO clustercode
                         (fk_clustercode_ID, 
                         fk_isolate_ID,
+                        fk_reference_ID,
                         t250,
                         t100,
                         t50,
@@ -156,6 +157,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                         VALUES (
                             (SELECT pk_ID from clustercode_snpaddress WHERE clustercode = %(clustercode)s),
                             (SELECT pk_ID from isolate WHERE y_number = %(y_number)s),
+                            (SELECT pk_ID from reference_metadata WHERE reference_name = %(reference_name)s),
                         %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
                         %(t10)s, %(t5)s, %(t2)s, %(t0)s,
                         %(clustercode_updated)s);
@@ -206,13 +208,15 @@ def get_all_clustercode_data(config_dict, records=None):
                 c.t0,
                 cs.wg_number,
                 cs.clustercode,
-                cs.reference_name,
-                cs.clustercode_frequency
+                cs.clustercode_frequency,
+                rm.reference_name
                 FROM isolate i 
                 JOIN clustercode c 
                 ON i.pk_ID = c.fk_isolate_ID 
                 JOIN clustercode_snpaddress cs 
-                ON c.fk_clustercode_ID = cs.pk_ID 
+                ON c.fk_clustercode_ID = cs.pk_ID
+                JOIN reference_metadata rm
+                ON c.fk_reference_id = rm.pk_ID 
                 WHERE y_number = %(y_number)s"""
 
                 dict_cur.execute(sql, record)
@@ -242,14 +246,16 @@ def get_all_clustercode_data(config_dict, records=None):
                     c.t2,
                     c.t0,
                     cs.wg_number,
-                    cs.clustercode, 
-                    cs.reference_name,
-                    cs.clustercode_frequency
+                    cs.clustercode,
+                    cs.clustercode_frequency,
+                    rm.reference_name
                     FROM isolate i 
                     JOIN clustercode c 
                     ON i.pk_ID = c.fk_isolate_ID 
                     JOIN clustercode_snpaddress cs 
-                    ON c.fk_clustercode_ID = cs.pk_ID """
+                    ON c.fk_clustercode_ID = cs.pk_ID
+                    JOIN reference_metadata rm
+                    ON c.fk_reference_id = rm.pk_ID """
     
             dict_cur.execute(sql)
     

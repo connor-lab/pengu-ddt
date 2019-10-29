@@ -59,11 +59,29 @@ create table mlst(
     created_at timestamp default current_timestamp
     );
 
+create table reference_metadata(
+    pk_ID SERIAL primary key not null,
+    reference_name text unique not null,
+    snapperdb_db_name text unique not null,
+    ncbi_accession text,
+    genome_filename text unique not null,
+    created_at timestamp default current_timestamp
+    );
+
+create table reference_distance(
+    pk_ID SERIAL primary key not null,
+    fk_isolate_ID int not null references isolate(pk_ID),
+    fk_reference_ID int not null references reference_metadata(pk_ID),
+    reference_mash_distance decimal(11, 10),
+    reference_mash_p_value text not null,
+    reference_common_kmers text not null,
+    created_at timestamp default current_timestamp
+    );
+
 create table clustercode_snpaddress(
     pk_ID SERIAL primary key not null,
     clustercode text UNIQUE not null,
     wg_number text UNIQUE not null,
-    reference_name text not null,
     clustercode_frequency int not null,
     updated_at timestamp not null,
     created_at timestamp default current_timestamp
@@ -72,6 +90,7 @@ create table clustercode_snpaddress(
 create table clustercode(
     pk_ID SERIAL primary key not null,
     fk_isolate_ID int not null references isolate(pk_ID),
+    fk_reference_ID int not null references reference_metadata(pk_ID),
     t250 int not null,
     t100 int not null,
     t50 int not null,
@@ -93,24 +112,7 @@ create table clustercode_history(
     created_at timestamp default current_timestamp
     );
 
-create table reference_metadata(
-    pk_ID SERIAL primary key not null,
-    reference_name text unique not null,
-    snapperdb_db_name text unique not null,
-    ncbi_accession text,
-    genome_filename text unique not null,
-    created_at timestamp default current_timestamp
-    );
 
-create table reference_distance(
-    pk_ID SERIAL primary key not null,
-    fk_isolate_ID int not null references isolate(pk_ID),
-    fk_reference_ID int not null references reference_metadata(pk_ID),
-    reference_mash_distance decimal(11, 10),
-    reference_mash_p_value text not null,
-    reference_common_kmers text not null,
-    created_at timestamp default current_timestamp
-    );
 
 create table ribotype_metadata(
     pk_ID SERIAL primary key not null,

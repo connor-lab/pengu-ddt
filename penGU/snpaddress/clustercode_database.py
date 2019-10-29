@@ -38,21 +38,26 @@ def update_clustercode_database(config_dict, insert_dict_list):
 
     insert_dict_list_derep = []
     for row in insert_dict_list:
-        #if row["y_number"] not in row["reference_name"]:
-        clustercode_row = { "clustercode" : row["clustercode"], 
-                            "clustercode_frequency" : row["clustercode_frequency"],
-                            "reference_name" : row["reference_name"] }
-        if clustercode_row not in insert_dict_list_derep:
-            insert_dict_list_derep.append(clustercode_row)
-
-    #insert_dict_list_derep.append(create_singleton_clustercode())
+        if row["clustercode_frequency"] > 1:
+            clustercode_row = { "clustercode" : row["clustercode"], 
+                                "clustercode_frequency" : row["clustercode_frequency"],
+                                "reference_name" : row["reference_name"] }
+            if clustercode_row not in insert_dict_list_derep:
+                insert_dict_list_derep.append(clustercode_row)
+        else:
+            insert_dict_list_derep.append({ "clustercode" : "S", 
+                                            "clustercode_frequency" : 0,
+                                            "reference_name" : "NA" })
     
     try:
         for row in insert_dict_list_derep:
 
             row_id, current_year = get_current_year(config_dict)
 
-            if int(current_year) < int(f"{datetime.datetime.now():%y}"):
+            if row["clustercode"] is "S":
+                row["wg_number"] = "WG19-00000"
+
+            elif int(current_year) < int(f"{datetime.datetime.now():%y}"):
                 year = f"{datetime.datetime.now():%y}"
                 wg_id = 1
                 row['wg_number'] = "WG" +year+ "-" +'{:05d}'.format(wg_id)
@@ -62,7 +67,7 @@ def update_clustercode_database(config_dict, insert_dict_list):
                 wg_id = int(row_id) + 1
                 row['wg_number'] = "WG" +year+ "-" +'{:05d}'.format(wg_id)
 
-
+            
             row["clustercode_updated"] = datetime.datetime.now()
                         
             ## Does snpaddress exist in DB? If yes UPDATE if no INSERT
@@ -87,10 +92,9 @@ def update_clustercode_database(config_dict, insert_dict_list):
                 sql = """INSERT INTO clustercode_snpaddress
                         (clustercode,
                         clustercode_frequency,
-                        reference_name,
                         wg_number,
                         updated_at)
-                        VALUES (%(clustercode)s, %(clustercode_frequency)s, %(reference_name)s, %(wg_number)s, %(clustercode_updated)s);
+                        VALUES (%(clustercode)s, %(clustercode_frequency)s, %(wg_number)s, %(clustercode_updated)s);
                         """
                 cur.execute(sql, row)
       
