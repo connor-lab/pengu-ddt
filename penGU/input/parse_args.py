@@ -48,7 +48,10 @@ def parse_commandline_args():
     update_clustercode_db_parser.add_argument('-g', '--reference_name', dest='snapperdb_refgenome', required=True, help="Name of reference genome in snapperDB")
     update_clustercode_db_parser.add_argument('-o', '--output_csv', dest='output_csv', required=True, help="output csv containing updated snp addresses")
     
-    
+    # Dump data as xml file
+    output_xml_parser = subparsers.add_parser('output_xml')
+    output_xml_parser.add_argument('-ox', '--output_xml', dest='output_xml', required=True, help="output XML containing output data")
+    output_xml_parser.add_argument('-s', '--sample_name', dest='sample_name', required=True, help="sample name to generate XML for")
 
     # Parse args
     args = parser.parse_args()

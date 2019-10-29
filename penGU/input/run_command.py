@@ -16,6 +16,8 @@ from penGU.snpaddress.clustercode_isolate import get_snpaddresses_from_snapperdb
 from penGU.snpaddress.clustercode_database import update_clustercode_database
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
+from penGU.dump_xml.output import create_xml
+
 from penGU.input.utils import check_config
 from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv
 
@@ -51,14 +53,12 @@ def run_commmand(config_dict, args):
         snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
         all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, args.snapperdb_refgenome)
         
-
-        #if args.output_all:
-        #    write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)
-
-        #if args.isolate_file and args.output_csv:
         update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
         updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_refgenome, args.isolate_file, all_snapperdb_snpaddresses)
         if updated_records:
             update_clustercode_history(config_dict, updated_records)
             all_data_records = get_all_clustercode_data(config_dict, updated_records)
             write_updated_records_to_csv(all_data_records, args.output_csv)
+
+    elif 'output_xml' in args.command:
+        create_xml(config_dict, args.sample_name, args.output_xml)
