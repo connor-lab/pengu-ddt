@@ -38,8 +38,6 @@ def assign_singleton_clustercodes(clustercode_dict_list):
     for row in clustercode_dict_list:
         if row['clustercode_frequency'] == 1 and "NA" not in row['clustercode']:
             row['clustercode'] = "S"
-        #elif "NA" in row['clustercode']:
-        #    row['clustercode'] = "NA" 
         singleton_clustercode_dict_list.append(row)
 
     return singleton_clustercode_dict_list
@@ -85,9 +83,6 @@ def get_snpaddresses_from_snapperdb(snapperdb_config, refname):
         
 
 def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapperdb_addresses):
-    #snapperdb_config = check_config(snapperdb_conf, config_type="snapperdb")
-    #isolate_snpaddress_dict_list = get_snpaddresses_from_snapperdb(snapperdb_config, config_dict, refname)
-    #print(isolate_snpaddress_dict_list)
     NGSdb = NGSDatabase(config_dict)
     conn = NGSdb._connect_to_db()
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -284,5 +279,3 @@ def get_all_clustercode_data(config_dict, records=None):
 
     
     return all_clustercode_data
-
-    
