@@ -11,11 +11,9 @@ create table sequencing(
 	sequencing_instrument text,
 	sequencing_run text,
 	sequencing_start_date date,
-    sequencing_end_date date,
-    calculated_magnitude int,
-    trimmed_readlength decimal(5, 2),
-    mean_insert_size int,
-	qc_pass bool,
+    pipeline_start_date date,
+    ref_coverage_mean numeric,
+    ref_coverage_stddev numeric,
     created_at timestamp default current_timestamp
     );
 
