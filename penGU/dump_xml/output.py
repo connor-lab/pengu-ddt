@@ -29,37 +29,24 @@ def extract_data_from_db(config_dict, sample_name):
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
-        sql = """SELECT i.y_number,
-                c.t250,
-                c.t100,
-                c.t50,
-                c.t25,
-                c.t10,
-                c.t5,
-                c.t2,
-                c.t0,
-                cs.wg_number,
-                cs.clustercode,
-                rm.reference_name,
-                mst.ST,
-                mst.locus_1,
-                mst.locus_2,
-                mst.locus_3,
-                mst.locus_4,
-                mst.locus_5,
-                mst.locus_6,
-                mst.locus_7
-                FROM isolate i 
-                JOIN clustercode c 
-                ON i.pk_ID = c.fk_isolate_ID 
-                JOIN clustercode_snpaddress cs 
-                ON c.fk_clustercode_ID = cs.pk_ID
-                JOIN reference_metadata rm
-                ON c.fk_reference_id = rm.pk_ID
-                JOIN mlst_sequence_types mst 
-                ON 
-                    (SELECT fk_ST_ID FROM mlst WHERE fk_isolate_ID = i.pk_ID) = mst.pk_ID 
-                WHERE y_number = %s"""
+        sql = """SELECT i.y_number, 
+	             c.t250, c.t100, c.t50, c.t25, c.t10, c.t5, c.t2, c.t0, 
+	             cs.clustercode, cs.wg_number, cs.clustercode_frequency, 
+	             rm.reference_name,
+	             mst.st,
+	             st.locus_1, st.locus_2, st.locus_3, st.locus_4, st.locus_5, st.locus_6, st.locus_7 
+	             FROM isolate i 
+                    FULL OUTER JOIN clustercode c 
+                        ON i.pk_ID = c.fk_isolate_ID 
+                    FULL OUTER JOIN clustercode_snpaddress cs 
+                        ON c.fk_clustercode_ID = cs.pk_ID
+                    FULL OUTER JOIN reference_metadata rm
+                        ON c.fk_reference_id = rm.pk_ID 
+				    FULL OUTER JOIN mlst st 
+				        ON st.fk_isolate_id = i.pk_id 
+				    FULL OUTER JOIN mlst_sequence_types mst 
+				        ON st.fk_st_id = mst.pk_id
+	                WHERE i.y_number = %s """
 
         dict_cur.execute(sql, (sample_name,))
 
