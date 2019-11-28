@@ -21,8 +21,13 @@ def parse_commandline_args():
 
     # Add sequencing csv to database
     add_sequencing_metadata_parser = subparsers.add_parser('add_sequencing_metadata')
-    add_sequencing_metadata_parser.add_argument('-s', '--sequencing_csv', dest='sequencing_csv', required=True, help="csv containing sequencing run metadata")
-    
+    add_sequencing_metadata_parser.add_argument('-y', '--y_number', dest='y_number', required=True, help="y_number")
+    add_sequencing_metadata_parser.add_argument('-r', '--run_id', dest='run_id', required=True, help="Sequencer run ID")
+    add_sequencing_metadata_parser.add_argument('-d', '--depth', dest='depth', required=True, help="Sequencing depth")
+    add_sequencing_metadata_parser.add_argument('-s', '--stddev', dest='stddev', required=True, help="Sequencing depth stddev")
+    add_sequencing_metadata_parser.add_argument('-z', '--zscore_fail', dest='zscore_fail', action="store_true", help="Z-score fail")
+
+
     # Update mlst database
     update_mlst_db_parser = subparsers.add_parser('update_mlst_db')
     update_mlst_db_parser.add_argument('-p', '--pubmlst_url', dest='pubmlst_url', required=False, help="PubMLST URL to download MLST ST definitions (We'll use the previous one if not provided)")
