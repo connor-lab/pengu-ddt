@@ -2,6 +2,9 @@ import csv
 import os
 import sys
 
+from dicttoxml import dicttoxml
+from xml.dom.minidom import parseString
+
 def make_fieldnames(csv_data):
     fieldnames = []
     
@@ -37,3 +40,11 @@ def write_all_records_to_csv(records, output_csv):
         sorted_records = sorted(records, key=lambda x: ( x['clustercode'] is None, x['clustercode']))
         for row in sorted_records:            
             writer.writerow(row)
+
+def write_sample_to_xml(sample_data, output_xml):
+    xml = dicttoxml({ sample_data.get('sequencing_metadata').get('y_number') : sample_data }, custom_root="ARU_WGS_TYPING", attr_type=False)
+
+    dom = parseString(xml)
+
+    with open(output_xml, 'w') as ox:
+        ox.write(dom.toprettyxml())

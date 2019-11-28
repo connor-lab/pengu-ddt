@@ -16,10 +16,10 @@ from penGU.snpaddress.clustercode_isolate import get_snpaddresses_from_snapperdb
 from penGU.snpaddress.clustercode_database import update_clustercode_database
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
-from penGU.dump_xml.output import create_xml
-
 from penGU.input.utils import check_config
-from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv
+
+from penGU.output.sample_data import get_all_sample_data
+from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv, write_sample_to_xml
 
 
 def run_commmand(config_dict, args):
@@ -33,7 +33,13 @@ def run_commmand(config_dict, args):
         update_isolate_database(config_dict, args.isolate_csv)
     
     elif 'add_sequencing_metadata' in args.command:
-        update_sequencing_database(config_dict, args.sequencing_csv)
+        sequencing_meta_dict = { "y_number" : args.y_number, 
+                           "sequencing_run" : args.run_id,
+                        "ref_coverage_mean" : args.depth,
+                      "ref_coverage_stddev" : args.stddev,
+                             "z_score_fail" : args.zscore_fail }
+        
+        update_sequencing_database(config_dict, sequencing_meta_dict)
 
     elif 'update_mlst_db' in args.command:
         generate_mlst_refdb(config_dict, args.mlst_scheme_name, args.pubmlst_url)
@@ -61,4 +67,10 @@ def run_commmand(config_dict, args):
             write_updated_records_to_csv(all_data_records, args.output_csv)
 
     elif 'output_xml' in args.command:
-        create_xml(config_dict, args.sample_name, args.output_xml)
+        sample_data = get_all_sample_data(config_dict, args.sample_name)
+        write_sample_to_xml(sample_data, args.output_xml)
+    
+    elif 'output_summary_csv' in args.command:
+        sample_data = get_all_sample_data(config_dict, args.sample_name)
+        print("HELLO")
+        
