@@ -16,10 +16,10 @@ from penGU.snpaddress.clustercode_isolate import get_snpaddresses_from_snapperdb
 from penGU.snpaddress.clustercode_database import update_clustercode_database
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
-from penGU.input.utils import check_config
+from penGU.input.utils import check_config, read_lines_from_isolate_data
 
 from penGU.output.sample_data import get_all_sample_data
-from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv, write_sample_to_xml
+from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv, write_sample_xml, flatten_sample_dict
 
 
 def run_commmand(config_dict, args):
@@ -68,9 +68,16 @@ def run_commmand(config_dict, args):
 
     elif 'output_xml' in args.command:
         sample_data = get_all_sample_data(config_dict, args.sample_name)
-        write_sample_to_xml(sample_data, args.output_xml)
+        write_sample_xml(sample_data, args.output_xml)
     
     elif 'output_summary_csv' in args.command:
-        sample_data = get_all_sample_data(config_dict, args.sample_name)
-        print("HELLO")
+        isolates = read_lines_from_isolate_data(args.isolate_file)
+
+        csv_rows = []
+
+        for isolate in isolates:
+            sample_data = get_all_sample_data(config_dict, isolate)
+            csv_rows.append(flatten_sample_dict(sample_data))
+
+        print(csv_rows)
         

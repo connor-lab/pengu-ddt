@@ -41,10 +41,23 @@ def write_all_records_to_csv(records, output_csv):
         for row in sorted_records:            
             writer.writerow(row)
 
-def write_sample_to_xml(sample_data, output_xml):
+def write_sample_xml(sample_data, output_xml):
     xml = dicttoxml({ sample_data.get('sequencing_metadata').get('y_number') : sample_data }, custom_root="ARU_WGS_TYPING", attr_type=False)
 
     dom = parseString(xml)
 
     with open(output_xml, 'w') as ox:
         ox.write(dom.toprettyxml())
+
+def flatten_sample_dict(sample_dict):
+    def expand(key, value):
+        if isinstance(value, dict):
+            return [ (key + '|' + k, v) for k, v in flatten_sample_dict(value).items() ]
+        elif isinstance(value, list):
+            return [ (key, ",".join(value)) ]
+        else:
+            return [ (key, value) ]
+
+    items = [ item for k, v in sample_dict.items() for item in expand(k, v) ]
+
+    return dict(items)

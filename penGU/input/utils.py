@@ -39,7 +39,6 @@ def read_lines_from_isolate_data(isolate_list_file):
     else:
         path_to_file = isolate_list_file
     
-    isolate_list = []
     with open(path_to_file, mode='r') as text_file:
         isolate_list = text_file.read().splitlines()
         #isolate_list.append(isolate)
