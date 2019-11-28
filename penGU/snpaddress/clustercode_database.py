@@ -17,7 +17,7 @@ def get_current_year(config_dict):
         wg_year = last_record.get('wg_number').split("-")[0].replace("WG", "")
         wg_id = last_record.get('wg_number').split("-")[1]
     else:
-        wg_year = f"{datetime.datetime.now():%y}"
+        wg_year = datetime.datetime.now().year
         wg_id = 0
 
     return wg_id, wg_year
@@ -57,8 +57,8 @@ def update_clustercode_database(config_dict, insert_dict_list):
             if row["clustercode"] is "S":
                 row["wg_number"] = "WG19-00000"
 
-            elif int(current_year) < int(f"{datetime.datetime.now():%y}"):
-                year = f"{datetime.datetime.now():%y}"
+            elif int(current_year) < int(datetime.datetime.now().year):
+                year = datetime.datetime.now().year
                 wg_id = 1
                 row['wg_number'] = "WG" +year+ "-" +'{:05d}'.format(wg_id)
 
