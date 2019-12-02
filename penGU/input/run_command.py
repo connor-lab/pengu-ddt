@@ -19,7 +19,7 @@ from penGU.snpaddress.clustercode_history import update_clustercode_history
 from penGU.input.utils import check_config, read_lines_from_isolate_data
 
 from penGU.output.sample_data import get_all_sample_data
-from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv, write_sample_xml, flatten_sample_dict
+from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv, write_sample_xml, flatten_sample_dict, write_sample_data_to_csv, add_qc_pass_fail_to_sample_data
 
 
 def run_commmand(config_dict, args):
@@ -77,7 +77,11 @@ def run_commmand(config_dict, args):
 
         for isolate in isolates:
             sample_data = get_all_sample_data(config_dict, isolate)
+
+            if args.report_qc:
+                sample_data = add_qc_pass_fail_to_sample_data(sample_data)
+
             csv_rows.append(flatten_sample_dict(sample_data))
 
-        print(csv_rows)
+        write_sample_data_to_csv(csv_rows, args.output_csv)
         

@@ -161,9 +161,11 @@ def get_all_sample_data(config_dict, sample_name):
 
     categorised_sample_data['mlst_data'] = assign_locus_names_to_mlst(config_dict, categorised_sample_data.pop('mlst_data'))
 
-    snp_clusters = get_cluster_members(config_dict, categorised_sample_data.get('clustering_data').get('wg_number'), sample_name, categorised_sample_data.get('snp_typing_data'))
+    if not categorised_sample_data.get("clustering_data").get("clustercode") == "S":
 
-    categorised_sample_data['clustering_data'].update( { 'cluster_members' : snp_clusters } )
+        snp_clusters = get_cluster_members(config_dict, categorised_sample_data.get('clustering_data').get('wg_number'), sample_name, categorised_sample_data.get('snp_typing_data'))
+
+        categorised_sample_data['clustering_data'].update( { 'cluster_members' : snp_clusters } )
 
     return categorised_sample_data
 

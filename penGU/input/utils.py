@@ -40,12 +40,9 @@ def read_lines_from_isolate_data(isolate_list_file):
         path_to_file = isolate_list_file
     
     with open(path_to_file, mode='r') as text_file:
-        isolate_list = text_file.read().splitlines()
-        #isolate_list.append(isolate)
+        return text_file.read().splitlines()
     
-    return isolate_list
-
-
+    
 def string_to_bool(s):
     trues = ("yes", "true", "1")
     return s.lower() in trues

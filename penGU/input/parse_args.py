@@ -27,7 +27,6 @@ def parse_commandline_args():
     add_sequencing_metadata_parser.add_argument('-s', '--stddev', dest='stddev', required=True, help="Sequencing depth stddev")
     add_sequencing_metadata_parser.add_argument('-z', '--zscore_fail', dest='zscore_fail', action="store_true", help="Z-score fail")
 
-
     # Update mlst database
     update_mlst_db_parser = subparsers.add_parser('update_mlst_db')
     update_mlst_db_parser.add_argument('-p', '--pubmlst_url', dest='pubmlst_url', required=False, help="PubMLST URL to download MLST ST definitions (We'll use the previous one if not provided)")
@@ -62,6 +61,7 @@ def parse_commandline_args():
     output_summary_csv_parser = subparsers.add_parser('output_summary_csv')
     output_summary_csv_parser.add_argument('-oc', '--output_csv', dest='output_csv', required=True, help="CSV containing output data")
     output_summary_csv_parser.add_argument('-i', '--isolate_file', dest='isolate_file', required=True, help="Text file containing sample names, one per line")
+    output_summary_csv_parser.add_argument('-qc', '--report_qc', dest='report_qc', action="store_true", help="Report QC pass/fail in output")
     
     # Parse args
     args = parser.parse_args()
