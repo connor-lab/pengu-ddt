@@ -88,54 +88,88 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
+
+        static_columns = ['y_number', 'reference_name', 'original_id']
+
         modified_records = []
+
+
         for row in snapperdb_addresses:
+            modified_data = {}
             
             if row["y_number"] != row["reference_name"]:
                 row["clustercode_updated"] = datetime.datetime.now()
-                updated = {}
+
                 ## Does isolate exist in DB? If yes UPDATE if no INSERT
-                sql = """SELECT isolate.y_number,
-                      clustercode_snpaddress.clustercode,
-                      clustercode_snpaddress.wg_number,
-                      clustercode_snpaddress.clustercode_frequency
-                      FROM isolate,clustercode_snpaddress WHERE
-                      clustercode_snpaddress.pk_ID = (
-                      SELECT fk_clustercode_ID FROM clustercode WHERE fk_isolate_ID = (
-                      SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s))"""
+                sql = """SELECT i.y_number,
+                    i.original_ID,
+                    c.t250,
+                    c.t100,
+                    c.t50,
+                    c.t25,
+                    c.t10,
+                    c.t5,
+                    c.t2,
+                    c.t0,
+                    cs.wg_number,
+                    cs.clustercode,
+                    cs.clustercode_frequency
+                    FROM isolate i 
+                    JOIN clustercode c 
+                    ON i.pk_ID = c.fk_isolate_ID 
+                    JOIN clustercode_snpaddress cs 
+                    ON c.fk_clustercode_ID = cs.pk_ID
+                    WHERE y_number = %(y_number)s ; """
+                
                 dict_cur.execute(sql, row)
 
                 s = dict_cur.fetchone()
 
                 if s is not None:
-                    
-                    if s["clustercode"] != row["clustercode"]:
-                        updated["y_number"] = row["y_number"]
-                        updated["old_clustercode"] = s["clustercode"]
-                        updated["new_clustercode"] = row["clustercode"]
-                        updated["new_clustercode_frequency"] = row["clustercode_frequency"]
 
-                        print("Updating clustercode of isolate {} from {} to {}".format(row["y_number"], s["clustercode"], row["clustercode"]))
+                    changed_columns = []
+
+                    for key in s.keys() & row.keys():
+                        if not s.get(key) == row.get(key):
+                            changed_columns.append(key)
                     
-                        sql = """UPDATE clustercode
-                                SET fk_clustercode_ID = (
-                                    SELECT pk_ID FROM clustercode_snpaddress WHERE clustercode = %(clustercode)s),
-                                clustercode_updated = %(clustercode_updated)s
-                                WHERE fk_isolate_ID = (SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s)"""
+                    if changed_columns:
+
+                        sql = """UPDATE clustercode SET
+                                    fk_clustercode_ID = (SELECT pk_ID from clustercode_snpaddress WHERE clustercode = %(clustercode)s),
+                                    t250 = %(t250)s,
+                                    t100 = %(t100)s,
+                                    t50 = %(t50)s,
+                                    t25 = %(t25)s,
+                                    t10 = %(t10)s,
+                                    t5 = %(t5)s,
+                                    t2 = %(t2)s,
+                                    t0 = %(t0)s,
+                                    clustercode_updated = %(clustercode_updated)s
+                                    WHERE fk_isolate_ID = (SELECT pk_ID from isolate WHERE y_number = %(y_number)s) """
 
                         dict_cur.execute(sql, (row))
 
-                    elif s["clustercode"] == row["clustercode"]:
+                        for column in static_columns:
+                            modified_data.update( { column : row.get(column) } )
+
+                        for k, v in s.items():
+                            if k not in static_columns:
+                                modified_data.update( { "old_" + k : v } )
+                            
+                        for k, v in row.items():
+                            if k not in static_columns:
+                                modified_data.update( { "new_" + k : v } )
+
+
+                        modified_data.update( { "UPDATED" : ";".join(changed_columns) } )
+
+                    else:
                         print("Not updating clustercode of isolate {} ({} == {})".format(row["y_number"], s["clustercode"], row["clustercode"]))
 
-                if s is None:
-                    updated["y_number"] = row["y_number"]
-                    updated["old_clustercode"] = None
-                    updated["new_clustercode"] = row["clustercode"]
-                    updated["new_clustercode_frequency"] = row["clustercode_frequency"]
-
+                else:
                     print("Adding isolate {} to database with clustercode {}".format(row["y_number"], row["clustercode"]))
-                
+
                     sql = """INSERT INTO clustercode
                         (fk_clustercode_ID, 
                         fk_isolate_ID,
@@ -155,12 +189,19 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                             (SELECT pk_ID from reference_metadata WHERE reference_name = %(reference_name)s),
                         %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
                         %(t10)s, %(t5)s, %(t2)s, %(t0)s,
-                        %(clustercode_updated)s);
-                        """
+                        %(clustercode_updated)s); """
+                        
                     dict_cur.execute(sql, row)
 
-                if updated:
-                    modified_records.append(updated)              
+                    for column in static_columns:
+                            modified_data.update( { column : row.get(column) } )
+
+                    for k, v in row.items():
+                            if k not in static_columns:
+                                modified_data.update( { "new_" + k : v } )
+            
+            if modified_data:
+                modified_records.append(modified_data)              
         
         conn.commit()
         dict_cur.close()

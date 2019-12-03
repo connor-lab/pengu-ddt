@@ -106,12 +106,26 @@ create table clustercode(
 create table clustercode_history(
     pk_ID SERIAL primary key not null,
     fk_isolate_ID int not null references isolate(pk_ID),
-    fk_old_clustercode_ID int not null references clustercode_snpaddress(pk_ID),
+    new_t250 int not null,
+    new_t100 int not null,
+    new_t50 int not null,
+    new_t25 int not null,
+    new_t10 int not null,
+    new_t5 int not null,
+    new_t2 int not null,
+    new_t0 int not null,
     fk_new_clustercode_ID int not null references clustercode_snpaddress(pk_ID),
+    old_t250 int not null,
+    old_t100 int not null,
+    old_t50 int not null,
+    old_t25 int not null,
+    old_t10 int not null,
+    old_t5 int not null,
+    old_t2 int not null,
+    old_t0 int not null,
+    fk_old_clustercode_ID int not null references clustercode_snpaddress(pk_ID),
     created_at timestamp default current_timestamp
     );
-
-
 
 create table ribotype_metadata(
     pk_ID SERIAL primary key not null,

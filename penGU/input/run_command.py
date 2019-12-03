@@ -56,15 +56,26 @@ def run_commmand(config_dict, args):
         write_all_records_to_csv(all_snapperdb_snpaddresses, args.output_all)
 
     elif 'update_clustercode_db' in args.command:
+        # Check config
         snapperdb_config = check_config(args.snapperdb_conf, config_type="snapperdb")
+
+        # Get all snp addresses from a snapperDB instance
         all_snapperdb_snpaddresses = get_snpaddresses_from_snapperdb(snapperdb_config, args.snapperdb_refgenome)
-        
-        update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
+
+        # Update the clustercode database, returning { clustercode : wg_number }
+        clustercode_wgnumber = update_clustercode_database(config_dict, all_snapperdb_snpaddresses)
+
+        # Assign wg_numbers to all records
+        for record in all_snapperdb_snpaddresses:
+            record['wg_number'] = clustercode_wgnumber.get(record['clustercode'])
+
+        # Find any records with any data points updated and return a list of dicts of updated records
         updated_records = update_isolate_clustercode_db(config_dict, args.snapperdb_refgenome, args.isolate_file, all_snapperdb_snpaddresses)
+        
+        # Update isolate history table and write updated samples to a csv 
         if updated_records:
             update_clustercode_history(config_dict, updated_records)
-            all_data_records = get_all_clustercode_data(config_dict, updated_records)
-            write_updated_records_to_csv(all_data_records, args.output_csv)
+            write_updated_records_to_csv(updated_records, args.output_csv)
 
     elif 'output_xml' in args.command:
         sample_data = get_all_sample_data(config_dict, args.sample_name)

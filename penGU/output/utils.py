@@ -17,6 +17,11 @@ def make_fieldnames(csv_data):
 
 def write_updated_records_to_csv(updated_records, output_csv):
 
+    for row in updated_records:
+        if not row.get("old_clustercode"):
+            row["old_clustercode"] = "NA"
+            
+
     fieldnames = make_fieldnames(updated_records)
 
     with open(output_csv, 'w') as csvfile:
@@ -25,9 +30,6 @@ def write_updated_records_to_csv(updated_records, output_csv):
         writer.writeheader()
         sorted_updated_records = sorted(updated_records, key=lambda x: ( x['new_clustercode'] is None, x['new_clustercode']))
         for row in sorted_updated_records:
-            if not row["old_clustercode"]:
-                row["old_clustercode"] = "NA"
-            
             writer.writerow(row)
 
 def write_all_records_to_csv(records, output_csv):
