@@ -6,11 +6,13 @@ from dicttoxml import dicttoxml
 from xml.dom.minidom import parseString
 
 def make_fieldnames(csv_data):
-    fieldnames = [ "y_number","original_id","new_data","UPDATED","reference_name",
-                   "old_clustercode","old_clustercode_frequency","old_wg_number", 
-                   "old_t250","old_t100","old_t50","old_t25","old_t10","old_t5","old_t2","old_t0",
-                   "new_clustercode","new_clustercode_frequency","new_wg_number","new_clustercode_updated",
-                   "new_t250","new_t100","new_t50","new_t25","new_t10","new_t5","new_t2","new_t0" ]
+
+    fieldnames = []
+    
+    for row in csv_data:
+        for fieldname in row:
+            if fieldname not in fieldnames:
+                fieldnames.append(fieldname)    
     
     return fieldnames
 
@@ -21,7 +23,11 @@ def write_updated_records_to_csv(updated_records, output_csv):
             row["old_clustercode"] = "NA"
             
 
-    fieldnames = make_fieldnames(updated_records)
+    fieldnames = [ "y_number","original_id","new_data","UPDATED","reference_name",
+                   "old_clustercode","old_clustercode_frequency","old_wg_number", 
+                   "old_t250","old_t100","old_t50","old_t25","old_t10","old_t5","old_t2","old_t0",
+                   "new_clustercode","new_clustercode_frequency","new_wg_number","new_clustercode_updated",
+                   "new_t250","new_t100","new_t50","new_t25","new_t10","new_t5","new_t2","new_t0" ]
 
     with open(output_csv, 'w') as csvfile:
 
