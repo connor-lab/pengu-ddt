@@ -135,6 +135,8 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                     
                     if changed_columns:
 
+                        changed_data = ";".join(sorted(changed_columns))
+
                         sql = """UPDATE clustercode SET
                                     fk_clustercode_ID = (SELECT pk_ID from clustercode_snpaddress WHERE clustercode = %(clustercode)s),
                                     t250 = %(t250)s,
@@ -161,8 +163,10 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                             if k not in static_columns:
                                 modified_data.update( { "new_" + k : v } )
 
+                        print("Isolate {} has changed attributes: {}".format(row["y_number"], changed_data ))
 
-                        modified_data.update( { "UPDATED" : ";".join(changed_columns) } )
+
+                        modified_data.update( { "UPDATED" : changed_data } )
 
                     else:
                         print("Not updating clustercode of isolate {} ({} == {})".format(row["y_number"], s["clustercode"], row["clustercode"]))
