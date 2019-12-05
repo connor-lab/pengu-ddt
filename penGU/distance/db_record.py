@@ -8,15 +8,15 @@ from penGU.input.utils import read_data_from_csv
 def parse_dist_csv(dist_dict):
     for row in dist_dict:
         row["reference_name"] = os.path.splitext(os.path.basename(row["reference_name"]))[0]
-        row["y_number"] = os.path.splitext(os.path.basename(row["y_number"]))[0]
-        if row["y_number"].startswith("DIGCD"):
-            m = re.search('DIGCD-(.*)_S\\d+$', row["y_number"])
-            row["y_number"] = m.group(1)
+        row["accession"] = os.path.splitext(os.path.basename(row["accession"]))[0]
+        if row["accession"].startswith("DIGCD"):
+            m = re.search('DIGCD-(.*)_S\\d+$', row["accession"])
+            row["accession"] = m.group(1)
     return dist_dict
 
 def update_distance_database(config_dict, dist_csv):
     dist_cols = ["reference_name",
-                 "y_number",
+                 "accession",
                  "reference_mash_distance",
                  "reference_mash_p_value",
                  "reference_common_kmers"]
@@ -35,7 +35,7 @@ def update_distance_database(config_dict, dist_csv):
                        reference_mash_distance, 
                        reference_mash_p_value,
                        reference_common_kmers)
-                       VALUES ((SELECT pk_ID from isolate WHERE y_number = %(y_number)s),
+                       VALUES ((SELECT pk_ID from isolate WHERE accession = %(accession)s),
                        (SELECT pk_ID from reference_metadata WHERE reference_name = %(reference_name)s), 
                        %(reference_mash_distance)s, %(reference_mash_p_value)s, 
                        %(reference_common_kmers)s);"""

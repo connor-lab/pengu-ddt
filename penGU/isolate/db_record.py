@@ -18,9 +18,9 @@ def update_isolate_database(config_dict, isolate_csv):
         
         for record in isolate_data_list:
 
-            print("Adding {y_number} | {episode_number} | {original_id} to the isolate database".format(**record))
+            print("Adding {accession} | {episode_number} | {original_id} to the isolate database".format(**record))
 
-            sql = """INSERT INTO isolate (y_number, episode_number, original_id) VALUES (%(y_number)s, %(episode_number)s, %(original_id)s)"""
+            sql = """INSERT INTO isolate (accession, episode_number, original_id) VALUES (%(accession)s, %(episode_number)s, %(original_id)s)"""
             
             cur.execute(sql, record)
         

@@ -21,7 +21,7 @@ def parse_commandline_args():
 
     # Add sequencing csv to database
     add_sequencing_metadata_parser = subparsers.add_parser('add_sequencing_metadata')
-    add_sequencing_metadata_parser.add_argument('-y', '--y_number', dest='y_number', required=True, help="y_number")
+    add_sequencing_metadata_parser.add_argument('-a', '--accession', dest='accession', required=True, help="accession")
     add_sequencing_metadata_parser.add_argument('-r', '--run_id', dest='run_id', required=True, help="Sequencer run ID")
     add_sequencing_metadata_parser.add_argument('-d', '--depth', dest='depth', required=True, help="Sequencing depth")
     add_sequencing_metadata_parser.add_argument('-s', '--stddev', dest='stddev', required=True, help="Sequencing depth stddev")
@@ -48,14 +48,14 @@ def parse_commandline_args():
     # Update clustercode database
     update_clustercode_db_parser = subparsers.add_parser('update_clustercode_db')
     update_clustercode_db_parser.add_argument('-a', '--snapperdb_conf', dest='snapperdb_conf', required=True, help="Snapper3 connection string 'host= dbname= user= password= '")
-    update_clustercode_db_parser.add_argument('-i', '--isolate_file', dest='isolate_file', required=True, help="textfile of y_numbers for isolate")
+    update_clustercode_db_parser.add_argument('-i', '--isolate_file', dest='isolate_file', required=True, help="textfile of accession numbers for isolates")
     update_clustercode_db_parser.add_argument('-g', '--reference_name', dest='snapperdb_refgenome', required=True, help="Name of reference genome in snapperDB")
     update_clustercode_db_parser.add_argument('-o', '--output_csv', dest='output_csv', required=True, help="output csv containing updated snp addresses")
     
     # Dump data as xml file
     output_xml_parser = subparsers.add_parser('output_xml')
     output_xml_parser.add_argument('-ox', '--output_xml', dest='output_xml', required=True, help="XML containing output data")
-    output_xml_parser.add_argument('-s', '--sample_name', dest='sample_name', required=True, help="sample name to generate XML for")
+    output_xml_parser.add_argument('-a', '--accession', dest='sample_name', required=True, help="Sample accession to generate XML for")
 
     # Dump CSV of everything we know about a list of isolates
     output_summary_csv_parser = subparsers.add_parser('output_summary_csv')

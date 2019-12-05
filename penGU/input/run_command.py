@@ -33,7 +33,7 @@ def run_commmand(config_dict, args):
         update_isolate_database(config_dict, args.isolate_csv)
     
     elif 'add_sequencing_metadata' in args.command:
-        sequencing_meta_dict = { "y_number" : args.y_number, 
+        sequencing_meta_dict = { "accession" : args.accession, 
                            "sequencing_run" : args.run_id,
                         "ref_coverage_mean" : args.depth,
                       "ref_coverage_stddev" : args.stddev,
@@ -78,7 +78,7 @@ def run_commmand(config_dict, args):
             write_updated_records_to_csv(updated_records, args.output_csv)
 
     elif 'output_xml' in args.command:
-        sample_data = get_all_sample_data(config_dict, args.sample_name)
+        sample_data = get_all_sample_data(config_dict, args.accession)
         sample_data = add_qc_pass_fail_to_sample_data(sample_data)
         
         write_sample_xml(sample_data, args.output_xml)

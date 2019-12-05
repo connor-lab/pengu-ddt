@@ -29,7 +29,7 @@ def update_clustercode_history(config_dict, updated_records):
                         old_t2,
                         old_t0 )
                         VALUES (
-                            (SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s), 
+                            (SELECT pk_ID FROM isolate WHERE accession = %(accession)s), 
                             (SELECT pk_ID FROM clustercode_snpaddress WHERE clustercode = %(old_clustercode)s),
                             (SELECT pk_ID FROM clustercode_snpaddress WHERE clustercode =  %(new_clustercode)s),
                             %(new_t250)s, %(new_t100)s, %(new_t50)s, %(new_t25)s, %(new_t10)s, %(new_t5)s, %(new_t2)s, %(new_t0)s, 

@@ -1,6 +1,6 @@
 create table isolate(
 	pk_ID serial primary key not null,
-	y_number text unique not null,
+	accession text unique not null,
     original_ID text unique not null,
 	episode_number text
     );

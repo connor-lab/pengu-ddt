@@ -27,7 +27,7 @@ def update_sequencing_database(config_dict, metadata_dict):
         NGSdb = NGSDatabase(config_dict)
         conn = NGSdb._connect_to_db()
         cur = conn.cursor()
-        print("Adding {y_number} | {sequencing_run} to the sequencing database".format(**metadata_dict))
+        print("Adding {accession} | {sequencing_run} to the sequencing database".format(**metadata_dict))
         sql = """INSERT INTO sequencing 
                        (fk_isolate_ID, 
                        sequencing_instrument, 
@@ -38,7 +38,7 @@ def update_sequencing_database(config_dict, metadata_dict):
                        ref_coverage_stddev,
                        z_score_fail) 
                        VALUES
-                       ((SELECT pk_ID FROM isolate WHERE y_number = %(y_number)s), 
+                       ((SELECT pk_ID FROM isolate WHERE accession = %(accession)s), 
                        %(sequencing_instrument)s, 
                        %(sequencing_run)s, 
                        %(sequencing_start_date)s, 

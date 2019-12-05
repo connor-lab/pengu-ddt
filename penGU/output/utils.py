@@ -23,7 +23,7 @@ def write_updated_records_to_csv(updated_records, output_csv):
             row["old_clustercode"] = "NA"
             
 
-    fieldnames = [ "y_number","original_id","new_data","UPDATED","reference_name",
+    fieldnames = [ "accession","original_id","new_data","UPDATED","reference_name",
                    "old_clustercode","old_clustercode_frequency","old_wg_number", 
                    "old_t250","old_t100","old_t50","old_t25","old_t10","old_t5","old_t2","old_t0",
                    "new_clustercode","new_clustercode_frequency","new_wg_number","new_clustercode_updated",
@@ -49,7 +49,7 @@ def write_all_records_to_csv(records, output_csv):
             writer.writerow(row)
 
 def write_sample_xml(sample_data, output_xml):
-    xml = dicttoxml({ sample_data.get('sequencing_metadata').get('y_number') : sample_data }, custom_root="ARU_WGS_TYPING", attr_type=False)
+    xml = dicttoxml({ sample_data.get('sequencing_metadata').get('accession') : sample_data }, custom_root="ARU_WGS_TYPING", attr_type=False)
 
     dom = parseString(xml)
 

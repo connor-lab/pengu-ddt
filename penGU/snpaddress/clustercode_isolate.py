@@ -18,7 +18,7 @@ def get_clustercode_counts(clustercode_dict_list):
     
     clustercodes = []
     for row in clustercode_dict_list:
-        if row["y_number"] in row["reference_name"]:
+        if row["accession"] in row["reference_name"]:
             row["clustercode"] = "NA"
         clustercodes.append(row['clustercode'])
 
@@ -69,7 +69,7 @@ def get_snpaddresses_from_snapperdb(snapperdb_config, refname):
                 if filter_snpaddress_levels(level, ['t250', 't100', 't50', 't25', 't10', 't5']):
                     address_string = '.'.join(str(a) for a in address)
         
-        sample_clustercode["y_number"] = sample.get("sample_name")
+        sample_clustercode["accession"] = sample.get("sample_name")
         sample_clustercode["clustercode"] = refname + "." + address_string
         sample_clustercode["reference_name"] = refname
 
@@ -89,7 +89,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
 
     try:
 
-        static_columns = ['y_number', 'reference_name', 'original_id']
+        static_columns = ['accession', 'reference_name', 'original_id']
 
         modified_records = []
 
@@ -97,11 +97,11 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
         for row in snapperdb_addresses:
             modified_data = {}
             
-            if row["y_number"] != row["reference_name"]:
+            if row["accession"] != row["reference_name"]:
                 row["clustercode_updated"] = datetime.datetime.now()
 
                 ## Does isolate exist in DB? If yes UPDATE if no INSERT
-                sql = """SELECT i.y_number,
+                sql = """SELECT i.accession,
                     i.original_ID,
                     c.t250,
                     c.t100,
@@ -119,7 +119,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                     ON i.pk_ID = c.fk_isolate_ID 
                     JOIN clustercode_snpaddress cs 
                     ON c.fk_clustercode_ID = cs.pk_ID
-                    WHERE y_number = %(y_number)s ; """
+                    WHERE accession = %(accession)s ; """
                 
                 dict_cur.execute(sql, row)
 
@@ -148,7 +148,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                                     t2 = %(t2)s,
                                     t0 = %(t0)s,
                                     clustercode_updated = %(clustercode_updated)s
-                                    WHERE fk_isolate_ID = (SELECT pk_ID from isolate WHERE y_number = %(y_number)s) """
+                                    WHERE fk_isolate_ID = (SELECT pk_ID from isolate WHERE accession = %(accession)s) """
 
                         dict_cur.execute(sql, (row))
 
@@ -163,16 +163,16 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                             if k not in static_columns:
                                 modified_data.update( { "new_" + k : v } )
 
-                        print("Isolate {} has changed attributes: {}".format(row["y_number"], changed_data ))
+                        print("Isolate {} has changed attributes: {}".format(row["accession"], changed_data ))
 
 
                         modified_data.update( { "UPDATED" : changed_data } )
 
                     else:
-                        print("Not updating clustercode of isolate {} ({} == {})".format(row["y_number"], s["clustercode"], row["clustercode"]))
+                        print("Not updating clustercode of isolate {} ({} == {})".format(row["accession"], s["clustercode"], row["clustercode"]))
 
                 else:
-                    print("Adding isolate {} to database with clustercode {}".format(row["y_number"], row["clustercode"]))
+                    print("Adding isolate {} to database with clustercode {}".format(row["accession"], row["clustercode"]))
 
                     sql = """INSERT INTO clustercode
                         (fk_clustercode_ID, 
@@ -189,7 +189,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
                         clustercode_updated)
                         VALUES (
                             (SELECT pk_ID from clustercode_snpaddress WHERE clustercode = %(clustercode)s),
-                            (SELECT pk_ID from isolate WHERE y_number = %(y_number)s),
+                            (SELECT pk_ID from isolate WHERE accession = %(accession)s),
                             (SELECT pk_ID from reference_metadata WHERE reference_name = %(reference_name)s),
                         %(t250)s, %(t100)s, %(t50)s, %(t25)s, 
                         %(t10)s, %(t5)s, %(t2)s, %(t0)s,
@@ -214,7 +214,7 @@ def update_isolate_clustercode_db(config_dict, refname, isolate_list_file, snapp
         isolate_list = read_lines_from_isolate_data(isolate_list_file)
 
         for record in modified_records:
-            if record["y_number"] in isolate_list:
+            if record["accession"] in isolate_list:
                 record["new_data"] = "TRUE"
             else:
                 record["new_data"] = None
@@ -236,7 +236,7 @@ def get_all_clustercode_data(config_dict, records=None):
             all_clustercode_data = []
             for record in records:
 
-                sql = """SELECT i.y_number,
+                sql = """SELECT i.accession,
                 i.original_ID,
                 c.t250,
                 c.t100,
@@ -257,7 +257,7 @@ def get_all_clustercode_data(config_dict, records=None):
                 ON c.fk_clustercode_ID = cs.pk_ID
                 JOIN reference_metadata rm
                 ON c.fk_reference_id = rm.pk_ID 
-                WHERE y_number = %(y_number)s"""
+                WHERE accession = %(accession)s"""
 
                 dict_cur.execute(sql, record)
 
@@ -275,7 +275,7 @@ def get_all_clustercode_data(config_dict, records=None):
     else:
         try:
 
-            sql = """SELECT i.y_number,
+            sql = """SELECT i.accession,
                     i.original_ID,
                     c.t250,
                     c.t100,
@@ -308,19 +308,16 @@ def get_all_clustercode_data(config_dict, records=None):
     dict_cur.close()
     conn.close()
 
-    y_number_regex = re.compile("^\\d{4}-\\d{6}")
+    accession_regex = re.compile("^\\d{4}-\\d{6}")
 
     for record in all_clustercode_data:
 
-        y_number_rev = record['y_number'][::-1]
+        accession_rev = record['accession'][::-1]
 
-        if y_number_regex.match(y_number_rev):
-            y_number_datetime = y_number_rev.split("_")[0]
-            record['pipeline_time'] = y_number_datetime.split("-")[0][::-1]
-            record['pipeline_date'] = y_number_datetime.split("-")[1][::-1]
-            record['y_number'] = "".join(y_number_rev.split("_")[1:])[::0-1]
-    
-
-
-    
+        if accession_regex.match(accession_rev):
+            accession_datetime = accession_rev.split("_")[0]
+            record['pipeline_time'] = accession_datetime.split("-")[0][::-1]
+            record['pipeline_date'] = accession_datetime.split("-")[1][::-1]
+            record['accession'] = "".join(accession_rev.split("_")[1:])[::0-1]
+      
     return all_clustercode_data

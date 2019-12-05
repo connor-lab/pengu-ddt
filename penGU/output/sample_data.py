@@ -3,7 +3,7 @@ import psycopg2, psycopg2.extras
 from penGU.db.NGSDatabase import NGSDatabase
 
 def categorise_output_data(sample_data):
-    sequencing_metadata = [ 'y_number', 'sequencing_start_date', 'sequencing_instrument', 'pipeline_start_date', 'sequencing_run' ]
+    sequencing_metadata = [ 'accession', 'sequencing_start_date', 'sequencing_instrument', 'pipeline_start_date', 'sequencing_run' ]
     reference_picking_data = [ 'reference_name', 'reference_common_kmers', 'reference_mash_distance', 'reference_mash_p_value', 'ref_coverage_mean', 'ref_coverage_stddev' ]
     snp_typing_data = [ 't250', 't100', 't50', 't25', 't10', 't5', 't2', 't0' ]
     clustering_data = [ 'clustercode', 'clustercode_frequency', 'wg_number', 'z_score_fail' ]
@@ -69,7 +69,7 @@ def get_cluster_data_from_db(config_dict, wg_number):
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
-        sql = """SELECT i.y_number, c.t2, c.t0 FROM isolate i
+        sql = """SELECT i.accession, c.t2, c.t0 FROM isolate i
                  JOIN clustercode c
                  ON i.pk_ID = c.fk_isolate_ID
                  JOIN clustercode_snpaddress cs
@@ -97,14 +97,14 @@ def get_cluster_members(config_dict, wg_number, sample_name, sample_snp_type ):
     clustered_samples = { '0SNP' : [], '2SNP' : [], '5SNP' : [] }
 
     for row in cluster_data:
-        if not row.get('y_number') == sample_name:
+        if not row.get('accession') == sample_name:
             if row.get('t2') == sample_snp_type.get('t2'):
                 if row.get('t0') == sample_snp_type.get('t0'):
-                    clustered_samples['0SNP'].append(row.get('y_number'))
+                    clustered_samples['0SNP'].append(row.get('accession'))
                 else:
-                    clustered_samples['2SNP'].append(row.get('y_number'))
+                    clustered_samples['2SNP'].append(row.get('accession'))
             else:
-                clustered_samples['5SNP'].append(row.get('y_number'))
+                clustered_samples['5SNP'].append(row.get('accession'))
 
     return clustered_samples
    
@@ -114,7 +114,7 @@ def extract_data_from_db(config_dict, sample_name):
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
-        sql = """SELECT i.y_number,
+        sql = """SELECT i.accession,
                  s.sequencing_run, s.sequencing_instrument, s.sequencing_start_date, s.pipeline_start_date,
                  s.ref_coverage_mean, s.ref_coverage_stddev, s.z_score_fail,
 	             c.t250, c.t100, c.t50, c.t25, c.t10, c.t5, c.t2, c.t0, 
@@ -138,7 +138,7 @@ def extract_data_from_db(config_dict, sample_name):
 				        ON st.fk_st_id = mst.pk_id
                     FULL OUTER JOIN reference_distance rd
                         ON i.pk_id = rd.fk_isolate_id
-	                WHERE i.y_number = %s 
+	                WHERE i.accession = %s 
                     ORDER BY rd.reference_mash_distance 
                     ASC LIMIT 1"""
 
