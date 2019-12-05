@@ -23,9 +23,9 @@ def parse_commandline_args():
     add_sequencing_metadata_parser = subparsers.add_parser('add_sequencing_metadata')
     add_sequencing_metadata_parser.add_argument('-a', '--accession', dest='accession', required=True, help="accession")
     add_sequencing_metadata_parser.add_argument('-r', '--run_id', dest='run_id', required=True, help="Sequencer run ID")
-    add_sequencing_metadata_parser.add_argument('-d', '--depth', dest='depth', required=True, help="Sequencing depth")
-    add_sequencing_metadata_parser.add_argument('-s', '--stddev', dest='stddev', required=True, help="Sequencing depth stddev")
-    add_sequencing_metadata_parser.add_argument('-z', '--zscore_fail', dest='zscore_fail', action="store_true", help="Z-score fail")
+    add_sequencing_metadata_parser.add_argument('-d', '--depth', dest='depth', required=False, help="Sequencing depth")
+    add_sequencing_metadata_parser.add_argument('-s', '--stddev', dest='stddev', required=False, help="Sequencing depth stddev")
+    add_sequencing_metadata_parser.add_argument('-z', '--zscore_fail', dest='zscore_fail', required=False, help="Z-score fail (true/false)")
 
     # Update mlst database
     update_mlst_db_parser = subparsers.add_parser('update_mlst_db')

@@ -16,7 +16,7 @@ from penGU.snpaddress.clustercode_isolate import get_snpaddresses_from_snapperdb
 from penGU.snpaddress.clustercode_database import update_clustercode_database
 from penGU.snpaddress.clustercode_history import update_clustercode_history
 
-from penGU.input.utils import check_config, read_lines_from_isolate_data
+from penGU.input.utils import check_config, read_lines_from_isolate_data, string_to_bool
 
 from penGU.output.sample_data import get_all_sample_data
 from penGU.output.utils import write_updated_records_to_csv, write_all_records_to_csv, write_sample_xml, flatten_sample_dict, write_sample_data_to_csv, add_qc_pass_fail_to_sample_data
@@ -33,11 +33,19 @@ def run_commmand(config_dict, args):
         update_isolate_database(config_dict, args.isolate_csv)
     
     elif 'add_sequencing_metadata' in args.command:
+        if args.zscore_fail:
+            if string_to_bool(args.zscore_fail):
+                zscore_fail = True
+            else:
+                zscore_fail = True
+        else:
+            zscore_fail = None
+
         sequencing_meta_dict = { "accession" : args.accession, 
-                           "sequencing_run" : args.run_id,
-                        "ref_coverage_mean" : args.depth,
-                      "ref_coverage_stddev" : args.stddev,
-                             "z_score_fail" : args.zscore_fail }
+                            "sequencing_run" : args.run_id,
+                         "ref_coverage_mean" : args.depth,
+                       "ref_coverage_stddev" : args.stddev,
+                              "z_score_fail" : zscore_fail }
         
         update_sequencing_database(config_dict, sequencing_meta_dict)
 

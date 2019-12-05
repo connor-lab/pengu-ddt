@@ -4,21 +4,28 @@ import psycopg2
 from penGU.db.NGSDatabase import NGSDatabase
 from penGU.input.utils import string_to_bool
 
-def split_run_id(sequencing_data_list):
-    for record in sequencing_data_list:
-        record["sequencing_start_date"] = datetime.strptime(record["sequencing_start_date"], '%Y-%m-%d')
-        record["sequencing_end_date"] = datetime.strptime(record["sequencing_end_date"], '%Y-%m-%d')
-        record["qc_pass"] = string_to_bool(record["qc_pass"])
-    return sequencing_data_list
-
-
 def update_sequencing_database(config_dict, metadata_dict):
+
+    sequencing_run_metadata = {}
+
+    sequencing_run_metadata["pipeline_start_date"] = datetime.now()]
 
     sequencing_run_list = metadata_dict["sequencing_run"].split("_")
 
-    sequencing_run_metadata = {"sequencing_start_date": datetime.strptime(sequencing_run_list[0], '%y%m%d' ),
-                               "sequencing_instrument": sequencing_run_list[1],
-                                "pipeline_start_date" : datetime.now() }
+    if len(sequencing_run_list) > 1:
+        try:
+            sequencing_start_date = datetime.strptime(sequencing_run_list[0], '%y%m%d' )
+            sequencing_run_metadata["sequencing_start_date"] = sequencing_start_date
+
+        except ValueError:
+            sequencing_start_date = datetime.strptime(sequencing_run_list[0], '%y%m%d' )
+            sequencing_run_metadata["sequencing_start_date"] = None
+
+        sequencing_run_metadata["sequencing_instrument"] = sequencing_run_list[1]
+
+    else:
+         sequencing_run_metadata["sequencing_instrument"] = None
+         sequencing_run_metadata["sequencing_start_date"] = None
 
     metadata_dict.update( sequencing_run_metadata )
 
