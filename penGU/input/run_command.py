@@ -79,6 +79,8 @@ def run_commmand(config_dict, args):
 
     elif 'output_xml' in args.command:
         sample_data = get_all_sample_data(config_dict, args.sample_name)
+        sample_data = add_qc_pass_fail_to_sample_data(sample_data)
+        
         write_sample_xml(sample_data, args.output_xml)
     
     elif 'output_summary_csv' in args.command:
