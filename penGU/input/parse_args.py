@@ -55,7 +55,7 @@ def parse_commandline_args():
     # Dump data as xml file
     output_xml_parser = subparsers.add_parser('output_xml')
     output_xml_parser.add_argument('-ox', '--output_xml', dest='output_xml', required=True, help="XML containing output data")
-    output_xml_parser.add_argument('-a', '--accession', dest='sample_name', required=True, help="Sample accession to generate XML for")
+    output_xml_parser.add_argument('-a', '--accession', dest='accession', required=True, help="Sample accession to generate XML for")
 
     # Dump CSV of everything we know about a list of isolates
     output_summary_csv_parser = subparsers.add_parser('output_summary_csv')
