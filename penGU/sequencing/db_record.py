@@ -43,7 +43,7 @@ def update_sequencing_database(config_dict, metadata_dict):
                        pipeline_start_date,
                        ref_coverage_mean, 
                        ref_coverage_stddev,
-                       z_score_fail) 
+                       z_score_pass) 
                        VALUES
                        ((SELECT pk_ID FROM isolate WHERE accession = %(accession)s), 
                        %(sequencing_instrument)s, 
@@ -52,7 +52,7 @@ def update_sequencing_database(config_dict, metadata_dict):
                        %(pipeline_start_date)s,
                        %(ref_coverage_mean)s, 
                        %(ref_coverage_stddev)s,
-                       %(z_score_fail)s )"""
+                       %(z_score_pass)s )"""
         cur.execute(sql, (metadata_dict))
         
         conn.commit()
