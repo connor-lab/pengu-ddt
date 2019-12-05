@@ -8,7 +8,7 @@ def update_sequencing_database(config_dict, metadata_dict):
 
     sequencing_run_metadata = {}
 
-    sequencing_run_metadata["pipeline_start_date"] = datetime.now()]
+    sequencing_run_metadata["pipeline_start_date"] = datetime.now()
 
     sequencing_run_list = metadata_dict["sequencing_run"].split("_")
 
