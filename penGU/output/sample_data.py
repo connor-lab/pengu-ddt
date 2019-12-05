@@ -6,7 +6,7 @@ def categorise_output_data(sample_data):
     sequencing_metadata = [ 'accession', 'sequencing_start_date', 'sequencing_instrument', 'pipeline_start_date', 'sequencing_run' ]
     reference_picking_data = [ 'reference_name', 'reference_common_kmers', 'reference_mash_distance', 'reference_mash_p_value', 'ref_coverage_mean', 'ref_coverage_stddev' ]
     snp_typing_data = [ 't250', 't100', 't50', 't25', 't10', 't5', 't2', 't0' ]
-    clustering_data = [ 'clustercode', 'clustercode_frequency', 'wg_number', 'z_score_fail' ]
+    clustering_data = [ 'clustercode', 'clustercode_frequency', 'wg_number', 'z_score_pass' ]
     
     mlst_data = [ 'st' ]
     for key in sample_data:
@@ -116,7 +116,7 @@ def extract_data_from_db(config_dict, sample_name):
     try:
         sql = """SELECT i.accession,
                  s.sequencing_run, s.sequencing_instrument, s.sequencing_start_date, s.pipeline_start_date,
-                 s.ref_coverage_mean, s.ref_coverage_stddev, s.z_score_fail,
+                 s.ref_coverage_mean, s.ref_coverage_stddev, s.z_score_pass,
 	             c.t250, c.t100, c.t50, c.t25, c.t10, c.t5, c.t2, c.t0, 
 	             cs.clustercode, cs.wg_number, cs.clustercode_frequency, 
 	             rm.reference_name,
