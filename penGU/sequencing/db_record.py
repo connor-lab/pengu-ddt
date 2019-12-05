@@ -24,8 +24,8 @@ def update_sequencing_database(config_dict, metadata_dict):
         sequencing_run_metadata["sequencing_instrument"] = sequencing_run_list[1]
 
     else:
-         sequencing_run_metadata["sequencing_instrument"] = None
-         sequencing_run_metadata["sequencing_start_date"] = None
+        sequencing_run_metadata["sequencing_instrument"] = None
+        sequencing_run_metadata["sequencing_start_date"] = None
 
     metadata_dict.update( sequencing_run_metadata )
 
