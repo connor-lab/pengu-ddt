@@ -34,18 +34,18 @@ def run_commmand(config_dict, args):
     
     elif 'add_sequencing_metadata' in args.command:
         if args.zscore_fail:
-            if string_to_bool(args.zscore_fail):
-                zscore_fail = True
+            if string_to_bool(args.zscore_pass):
+                zscore_pass = True
             else:
-                zscore_fail = True
+                zscore_pass = False
         else:
-            zscore_fail = None
+            zscore_pass = None
 
         sequencing_meta_dict = { "accession" : args.accession, 
                             "sequencing_run" : args.run_id,
                          "ref_coverage_mean" : args.depth,
                        "ref_coverage_stddev" : args.stddev,
-                              "z_score_fail" : zscore_fail }
+                              "z_score_pass" : zscore_pass }
         
         update_sequencing_database(config_dict, sequencing_meta_dict)
 

@@ -14,7 +14,7 @@ create table sequencing(
     pipeline_start_date date,
     ref_coverage_mean numeric,
     ref_coverage_stddev numeric,
-    z_score_fail bool,
+    z_score_pass bool,
     created_at timestamp default current_timestamp
     );
 
