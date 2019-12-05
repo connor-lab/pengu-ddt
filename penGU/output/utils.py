@@ -101,13 +101,17 @@ def add_qc_pass_fail_to_sample_data(sample_data):
             sample_data["reference_picking_data"].update( {"reference_distance_qc_fail" : True } )
         else:
             sample_data["reference_picking_data"].update( {"reference_distance_qc_fail" : False } )
+    else:
+        sample_data["reference_picking_data"].update( {"reference_distance_qc_fail" : None } )
 
 
     if sample_coverage is not None:
         if float(sample_coverage) < coverage_cutoff:
             sample_data["reference_picking_data"].update( {"ref_cov_qc_fail" : True } )
         else:
-            sample_data["reference_picking_data"].update( {"ref_cov_qc_fail" : True } )
+            sample_data["reference_picking_data"].update( {"ref_cov_qc_fail" : False } )
+    else:
+        sample_data["reference_picking_data"].update( {"ref_cov_qc_fail" : None } )
 
     return sample_data
 
