@@ -33,7 +33,7 @@ def run_commmand(config_dict, args):
         update_isolate_database(config_dict, args.isolate_csv)
     
     elif 'add_sequencing_metadata' in args.command:
-        if args.zscore_fail:
+        if args.zscore_pass:
             if string_to_bool(args.zscore_pass):
                 zscore_pass = True
             else:
